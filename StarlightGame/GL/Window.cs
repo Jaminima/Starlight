@@ -28,15 +28,16 @@ namespace StarlightGame.GL
             })
         {
             renderer = new Renderer();
-            entities = new Entity[10];
+            entities = new Entity[10000];
+            Random r = new Random();
             for (int i = 0; i < entities.Length; i++)
             {
                 entities[i] = new Entity
                 {
-                    X = i * 80,
-                    Y = i * 60,
-                    VX = 0,
-                    VY = 0,
+                    X = r.Next(0, 800),
+                    Y = r.Next(0, 600),
+                    VX = (float)(r.NextDouble() * 20 - 10),
+                    VY = (float)(r.NextDouble() * 20 - 10),
                     Mass = 1,
                     Rotation = 0,
                     Scale = 1,
