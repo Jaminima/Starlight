@@ -7,15 +7,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StarlightGame.StarlightLib.Types;
+using StarlightGame.StarlightLib;
 
 namespace StarlightGame.GL
 {
-    internal class Window : GameWindow
+    internal unsafe class Window : GameWindow
     {
         private int textureId;
         private int shaderProgram;
         private int vao, vbo;
         private Renderer renderer;
+        private Entity[] entities;
 
         public Window() : base(new GameWindowSettings(),
             new NativeWindowSettings()
@@ -25,6 +28,22 @@ namespace StarlightGame.GL
             })
         {
             renderer = new Renderer();
+            entities = new Entity[10];
+            for (int i = 0; i < entities.Length; i++)
+            {
+                entities[i] = new Entity
+                {
+                    X = i * 80,
+                    Y = i * 60,
+                    VX = 0,
+                    VY = 0,
+                    Mass = 1,
+                    Rotation = 0,
+                    Scale = 1,
+                    Layer = EntityLayer.Background,
+                    Type = EntityType.Player
+                };
+            }
         }
 
         protected override void OnLoad()
@@ -120,10 +139,11 @@ void main()
 
             Clear(ClearBufferMask.ColorBufferBit);
 
-            var colors = renderer.GetColorArray(ClientSize.X, ClientSize.Y);
+            var colors = new uint[ClientSize.X * ClientSize.Y];
+            renderer.RenderEntities(entities, colors, ClientSize.X, ClientSize.Y);
 
             BindTexture(TextureTarget.Texture2D, textureId);
-            TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgb, PixelType.UnsignedByte, colors);
+            TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, colors);
 
             UseProgram(shaderProgram);
             BindVertexArray(vao);
@@ -134,6 +154,7 @@ void main()
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            AmpSharp.UpdateEntities(entities, (float)e.Time);
         }
     }
 }

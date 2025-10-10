@@ -32,5 +32,17 @@ namespace StarlightGame.StarlightLib
                 update_entities(p, entities.Length, dt);
             }
         }
+
+        [DllImport("StarlightLib", CallingConvention = CallingConvention.StdCall)]
+        extern unsafe static void render_entities(Entity* particles, int particle_count, uint* canvas, int canvas_w, int canvas_h);
+
+        public unsafe static void RenderEntities(Entity[] particles, uint[] canvas, int canvas_w, int canvas_h)
+        {
+            fixed (Entity* pParticles = particles)
+            fixed (uint* pCanvas = canvas)
+            {
+                render_entities(pParticles, particles.Length, pCanvas, canvas_w, canvas_h);
+            }
+        }
     }
 }

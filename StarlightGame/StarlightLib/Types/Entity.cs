@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace StarlightGame.StarlightLib.Types
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal class Entity
+    internal struct Entity
     {
         public EntityLayer Layer;
         public EntityType Type;
