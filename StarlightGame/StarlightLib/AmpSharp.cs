@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StarlightGame.StarlightLib.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,6 +20,17 @@ namespace StarlightGame.StarlightLib
             }
 
             return input;
+        }
+
+        [DllImport("StarlightLib", CallingConvention = CallingConvention.StdCall)]
+        extern unsafe static void update_particles(Particle* particles, int count, float dt);
+
+        public unsafe static void UpdateParticles(Span<Particle> particles, float dt)
+        {
+            fixed (Particle* p = particles)
+            {
+                update_particles(p, particles.Length, dt);
+            }
         }
     }
 }
