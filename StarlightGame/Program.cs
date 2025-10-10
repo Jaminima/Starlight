@@ -16,16 +16,16 @@ namespace StarlightGame
             Console.WriteLine(string.Join(", ", result));
 
             // Complex type interop demo
-            var particles = new Particle[3];
-            particles[0] = new Particle { X = 0, Y = 0, Z = 0, Vx = 1, Vy = 0, Vz = 0, Mass = 1 };
-            particles[1] = new Particle { X = 0, Y = 0, Z = 0, Vx = 0, Vy = 1, Vz = 0, Mass = 2 };
-            particles[2] = new Particle { X = 0, Y = 0, Z = 0, Vx = 0, Vy = 0, Vz = 1, Mass = 3 };
+            var entities = new Entity[3];
+            entities[0] = new Entity { X = 0, Y = 0, VX = 1, VY = 0, Mass = 1 };
+            entities[1] = new Entity { X = 0, Y = 0, VX = 0, VY = 1, Mass = 2 };
+            entities[2] = new Entity { X = 0, Y = 0, VX = 0, VY = 0, Mass = 3 };
 
-            StarlightLib.AmpSharp.UpdateParticles(particles, 0.5f);
+            AmpSharp.UpdateEntities(entities, 0.005f);
 
-            for (int i = 0; i < particles.Length; i++)
+            for (int i = 0; i < entities.Length; i++)
             {
-                Console.WriteLine($"P{i}: ({particles[i].X}, {particles[i].Y}, {particles[i].Z}) m={particles[i].Mass}");
+                Console.WriteLine($"P{i}: ({entities[i].X}, {entities[i].Y}) m={entities[i].Mass}");
             }
         }
     }

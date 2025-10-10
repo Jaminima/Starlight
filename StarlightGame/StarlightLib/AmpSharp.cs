@@ -32,5 +32,16 @@ namespace StarlightGame.StarlightLib
                 update_particles(p, particles.Length, dt);
             }
         }
+
+        [DllImport("StarlightLib", CallingConvention = CallingConvention.StdCall)]
+        extern unsafe static void update_entities(Entity* entities, int count, float dt);
+
+        public unsafe static void UpdateEntities(Span<Entity> entities, float dt)
+        {
+            fixed (Entity* p = entities)
+            {
+                update_entities(p, entities.Length, dt);
+            }
+        }
     }
 }
