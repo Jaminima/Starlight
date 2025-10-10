@@ -40,9 +40,9 @@ namespace StarlightGame.GL
                     VY = (float)(r.NextDouble() * 20 - 10),
                     Mass = 1,
                     Rotation = 0,
-                    Scale = 1,
-                    Layer = EntityLayer.Background,
-                    Type = EntityType.Player
+                    Scale = r.Next(1,5),
+                    Layer = EntityLayer.Midground,
+                    Type = EntityType.Projectile
                 };
             }
         }
@@ -141,7 +141,7 @@ void main()
             Clear(ClearBufferMask.ColorBufferBit);
 
             var colors = new uint[ClientSize.X * ClientSize.Y];
-            renderer.RenderEntities(entities, colors, ClientSize.X, ClientSize.Y);
+            renderer.RenderEntities(entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
 
             BindTexture(TextureTarget.Texture2D, textureId);
             TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, colors);

@@ -1,24 +1,31 @@
 #include "pch.h"
 #include "renderer.h"
 
-void render_entities(Entity* particles, int particle_count, unsigned int* canvas, int canvas_w, int canvas_h) {
+void render_entities(Entity* particles, unsigned int particle_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
 	array_view<Entity, 1> entityView(particle_count, particles);
 	array_view<unsigned int, 1> canvasView(canvas_w * canvas_h, canvas);
 
-	parallel_for_each(extent<2>(canvas_h, canvas_w), [=](index<2> idx) restrict(amp) {
-		int y = idx[0];
-		int x = idx[1];
-		int pixelIndex = y * canvas_w + x;
-		unsigned int rgba = 0xFF000000; // Default to black pixel
-		for (int i = 0; i < particle_count; i++) {
-			Entity e = entityView[i];
-			int px = static_cast<int>(e.x);
-			int py = static_cast<int>(e.y);
-			if (px == x && py == y) {
-				rgba = 0xFFFFFFFF; // White pixel for particle
-				break;
+	parallel_for_each(extent<1>(particle_count), [=](index<1> idx) restrict(amp) {
+		int i = idx[0];
+		Entity e = entityView[i];
+		
+		if (e.type == Type_Projectile) {
+			render_circle(e, canvasView, canvas_w, canvas_h);
+		}
+	});
+}
+
+void render_circle(Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
+	int radius = e.scale;
+	for (int y = -radius; y <= radius; y++) {
+		for (int x = -radius; x <= radius; x++) {
+			if (x * x + y * y <= radius * radius) {
+				int px = e.x + x;
+				int py = e.y + y;
+				if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
+					canvasView[py * canvas_w + px] = 0xFFFFFFFF;
+				}
 			}
 		}
-		canvasView[pixelIndex] = rgba;
-		});
+	}
 }
