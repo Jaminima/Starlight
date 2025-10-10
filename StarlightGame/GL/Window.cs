@@ -19,23 +19,25 @@ namespace StarlightGame.GL
         private int vao, vbo;
         private Renderer renderer;
         private Entity[] entities;
+        private FPSTracker fpsTracker;
 
         public Window() : base(new GameWindowSettings(),
             new NativeWindowSettings()
             {
-                ClientSize = new OpenTK.Mathematics.Vector2i(800, 600),
+                ClientSize = new OpenTK.Mathematics.Vector2i(1920, 1080),
                 Title = "Starlight"
             })
         {
             renderer = new Renderer();
             entities = new Entity[10000];
+            fpsTracker = new FPSTracker();
             Random r = new Random();
             for (int i = 0; i < entities.Length; i++)
             {
                 entities[i] = new Entity
                 {
-                    X = r.Next(0, 800),
-                    Y = r.Next(0, 600),
+                    X = r.Next(0, ClientSize.X),
+                    Y = r.Next(0, ClientSize.Y),
                     VX = (float)(r.NextDouble() * 20 - 10),
                     VY = (float)(r.NextDouble() * 20 - 10),
                     Mass = 1,
@@ -137,6 +139,8 @@ void main()
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
+
+            fpsTracker.Update(e.Time);
 
             Clear(ClearBufferMask.ColorBufferBit);
 
