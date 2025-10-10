@@ -1,4 +1,5 @@
-﻿using StarlightGame.StarlightLib;
+﻿using StarlightGame.GL;
+using StarlightGame.StarlightLib;
 using StarlightGame.StarlightLib.Types;
 
 namespace StarlightGame
@@ -8,6 +9,10 @@ namespace StarlightGame
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
+
+            Window window = new Window();
+
+            window.Run();
 
             float [] data = new float[] { 1, 2, 3, 4, 5 };
 
