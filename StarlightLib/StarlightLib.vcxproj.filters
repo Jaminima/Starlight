@@ -37,8 +37,5 @@
     <ClCompile Include="ampsharp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Particle.h">
-      <Filter>Header Files\Types</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

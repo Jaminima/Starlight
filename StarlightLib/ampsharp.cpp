@@ -9,18 +9,6 @@ void _stdcall square_array(float* arr, int size) {
 	arrView.synchronize();
 }
 
-void _stdcall update_particles(Particle* particles, int count, float dt) {
-	array_view<Particle, 1> view(count, particles);
-	parallel_for_each(view.extent, [=](index<1> idx) restrict(amp) {
-		Particle p = view[idx];
-		p.x += p.vx * dt;
-		p.y += p.vy * dt;
-		p.z += p.vz * dt;
-		view[idx] = p;
-	});
-	view.synchronize();
-}
-
 void _stdcall update_entities(Entity* entities, int count, float dt) {
 	array_view<Entity, 1> view(count, entities);
 	parallel_for_each(view.extent, [=](index<1> idx) restrict(amp) {
