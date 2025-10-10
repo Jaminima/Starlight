@@ -15,8 +15,34 @@ namespace StarlightGame.StarlightLib.Types
         public float X, Y;
         public float VX, VY;
         public float Mass;
-        public float Rotation;
+        public float RotationDeg;
         public float Scale;
+
+        public void ApplyForwardForce(float force)
+        {
+            float rad = RotationDeg * (float)Math.PI / 180.0f;
+            VX += force * (float)Math.Sin(rad);
+            VY += force * (float)Math.Cos(rad);
+        }
+
+        public void ApplyBackwardForce(float force)
+        {
+            ApplyForwardForce(-force);
+        }
+
+        public void ApplyLeftForce(float force)
+        {
+            float rad = (RotationDeg - 90) * (float)Math.PI / 180.0f;
+            VX += force * (float)Math.Sin(rad);
+            VY += force * (float)Math.Cos(rad);
+        }
+
+        public void ApplyRightForce(float force)
+        {
+            float rad = (RotationDeg + 90) * (float)Math.PI / 180.0f;
+            VX += force * (float)Math.Sin(rad);
+            VY += force * (float)Math.Cos(rad);
+        }
     }
 
     internal enum EntityLayer

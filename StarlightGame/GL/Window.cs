@@ -1,5 +1,6 @@
 ﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using static OpenTK.Graphics.OpenGL4.GL;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -143,6 +144,18 @@ void main()
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            var keyboard = KeyboardState.GetSnapshot();
+
+            float speed = 200.0f * (float)e.Time;
+            if (keyboard.IsKeyDown(Keys.W)) scene.Entities[0].ApplyForwardForce(speed);
+            if (keyboard.IsKeyDown(Keys.S)) scene.Entities[0].ApplyBackwardForce(speed * 0.5f);
+            if (keyboard.IsKeyDown(Keys.A)) scene.Entities[0].ApplyLeftForce(speed * 0.15f);
+            if (keyboard.IsKeyDown(Keys.D)) scene.Entities[0].ApplyRightForce(speed * 0.15f);
+
+            float rotSpeed = 50.0f * (float)e.Time;
+            if (keyboard.IsKeyDown(Keys.Q)) scene.Entities[0].RotationDeg -= rotSpeed;
+            if (keyboard.IsKeyDown(Keys.E)) scene.Entities[0].RotationDeg += rotSpeed;
+
             AmpSharp.UpdateEntities(scene.Entities, (float)e.Time);
         }
     }

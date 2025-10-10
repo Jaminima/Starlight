@@ -40,7 +40,7 @@ void render_circle(Entity e, array_view<unsigned int, 1> canvasView, unsigned in
 void render_triangle(Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
 	int half_base = e.scale;
 	int height = e.scale * 2;
-	float angle_rad = e.rotation * 3.14159265f / 180.0f;
+	float angle_rad = -e.rotation * 3.14159265f / 180.0f;
 	float cos_a = cos(angle_rad);
 	float sin_a = sin(angle_rad);
 	for (int y = 0; y < height; y++) {

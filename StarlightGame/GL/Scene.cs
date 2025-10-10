@@ -12,6 +12,8 @@ namespace StarlightGame.GL
         public Entity[] Entities;
         private int entityHead = 0;
 
+        public Entity Player => Entities[0];
+
         public Scene() {
             this.Entities = new Entity[1000];
 
