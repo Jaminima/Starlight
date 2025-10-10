@@ -8,7 +8,9 @@ namespace StarlightGame
     {
         static void Main(string[] args)
         {
-            Window window = new Window();
+            Scene scene = new Scene();
+
+            Window window = new Window(scene);
 
             window.Run();
         }

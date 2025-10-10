@@ -11,5 +11,6 @@
 #include "framework.h"
 #define _SILENCE_AMP_DEPRECATION_WARNINGS
 #include <amp.h>
+#include <amp_math.h>
 
 #endif //PCH_H

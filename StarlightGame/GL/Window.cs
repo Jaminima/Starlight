@@ -18,35 +18,19 @@ namespace StarlightGame.GL
         private int shaderProgram;
         private int vao, vbo;
         private Renderer renderer;
-        private Entity[] entities;
         private FPSTracker fpsTracker;
+        private Scene scene;
 
-        public Window() : base(new GameWindowSettings(),
+        public Window(Scene scene) : base(new GameWindowSettings(),
             new NativeWindowSettings()
             {
                 ClientSize = new OpenTK.Mathematics.Vector2i(1920, 1080),
                 Title = "Starlight"
             })
         {
+            this.scene = scene;
             renderer = new Renderer();
-            entities = new Entity[10000];
             fpsTracker = new FPSTracker();
-            Random r = new Random();
-            for (int i = 0; i < entities.Length; i++)
-            {
-                entities[i] = new Entity
-                {
-                    X = r.Next(0, ClientSize.X),
-                    Y = r.Next(0, ClientSize.Y),
-                    VX = (float)(r.NextDouble() * 20 - 10),
-                    VY = (float)(r.NextDouble() * 20 - 10),
-                    Mass = 1,
-                    Rotation = 0,
-                    Scale = r.Next(1,5),
-                    Layer = EntityLayer.Midground,
-                    Type = EntityType.Projectile
-                };
-            }
         }
 
         protected override void OnLoad()
@@ -145,7 +129,7 @@ void main()
             Clear(ClearBufferMask.ColorBufferBit);
 
             var colors = new uint[ClientSize.X * ClientSize.Y];
-            renderer.RenderEntities(entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
+            renderer.RenderEntities(scene.Entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
 
             BindTexture(TextureTarget.Texture2D, textureId);
             TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, colors);
@@ -159,7 +143,7 @@ void main()
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            AmpSharp.UpdateEntities(entities, (float)e.Time);
+            AmpSharp.UpdateEntities(scene.Entities, (float)e.Time);
         }
     }
 }
