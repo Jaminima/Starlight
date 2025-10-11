@@ -25,7 +25,7 @@ namespace StarlightGame.GL
 
             //this.RandomProjectiles(90000);
 
-            this.RandomEnemies(200);
+            this.RandomEnemies(20);
         }
 
         private void InitPlayer()
@@ -56,8 +56,8 @@ namespace StarlightGame.GL
                     Type = EntityType.Enemy,
                     Mass = 1,
                     Scale = 5,
-                    X = (float)(rand.NextDouble() * 20000 - 10000),
-                    Y = (float)(rand.NextDouble() * 20000 - 10000),
+                    X = (float)(rand.NextDouble() * 10000 - 5000),
+                    Y = (float)(rand.NextDouble() * 10000 - 5000),
                     TargetIndex = -1,
                 };
                 AddEntity(enemy);

@@ -68,8 +68,21 @@ namespace StarlightGame.GL
                             if (entity.EventTime + 0.2f > entity.TimeAlive)
                                 break;
 
+                            float rad;
+                            int targetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0;
+                            if (targetIndex >= 0 && targetIndex < scene.entityHead)
+                            {
+                                var target = scene.Entities[targetIndex];
+                                float dx = target.X - entity.X;
+                                float dy = target.Y - entity.Y;
+                                rad = (float)Math.Atan2(dx, dy);
+                            }
+                            else
+                            {
+                                rad = entity.RotationDeg * (float)Math.PI / 180.0f;
+                            }
+
                             float projSpeed = 400.0f;
-                            float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
                             float offset = entity.Scale * 1.0f;
@@ -86,8 +99,8 @@ namespace StarlightGame.GL
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 5.0f,
-                                RotationDeg = entity.RotationDeg,
-                                TargetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0,
+                                RotationDeg = rad * 180.0f / (float)Math.PI,
+                                TargetIndex = targetIndex,
                             };
                             scene.AddEntity(proj);
                             entity.EventTime = entity.TimeAlive;
@@ -98,11 +111,24 @@ namespace StarlightGame.GL
 
                     case EntityEvent.FireMissile:
                         {
-                            if (entity.EventTime + 2.5f > entity.TimeAlive)
+                            if (entity.EventTime + 0.5f > entity.TimeAlive)
                                 break;
 
+                            float rad;
+                            int targetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0;
+                            if (targetIndex >= 0 && targetIndex < scene.entityHead)
+                            {
+                                var target = scene.Entities[targetIndex];
+                                float dx = target.X - entity.X;
+                                float dy = target.Y - entity.Y;
+                                rad = (float)Math.Atan2(dx, dy);
+                            }
+                            else
+                            {
+                                rad = entity.RotationDeg * (float)Math.PI / 180.0f;
+                            }
+
                             float projSpeed = 100.0f;
-                            float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
                             float offset = entity.Scale * 1.2f;
@@ -119,8 +145,8 @@ namespace StarlightGame.GL
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 10.0f,
-                                RotationDeg = entity.RotationDeg,
-                                TargetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0,
+                                RotationDeg = rad * 180.0f / (float)Math.PI,
+                                TargetIndex = targetIndex,
                             };
                             scene.AddEntity(proj);
                             entity.EventTime = entity.TimeAlive;
