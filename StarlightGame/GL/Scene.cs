@@ -9,6 +9,7 @@ namespace StarlightGame.GL
 {
     internal class Scene
     {
+        public Camera Camera = new Camera() { X = 0, Y = 0, Zoom = 1.0f };
         public Entity[] Entities;
         private int entityHead = 0;
 
@@ -28,8 +29,8 @@ namespace StarlightGame.GL
                 Type = EntityType.Player,
                 Mass = 1,
                 Scale = 10,
-                X = 100,
-                Y = 100,
+                X = 10,
+                Y = 10,
             };
 
             this.Entities[0] = player;

@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "renderer.h"
 
-void render_entities(Entity* particles, unsigned int particle_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
+void render_entities(Camera* camera, Entity* particles, unsigned int particle_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
 	array_view<Entity, 1> entityView(particle_count, particles);
 	array_view<unsigned int, 1> canvasView(canvas_w * canvas_h, canvas);
+	Camera cam = *camera;
 
 	parallel_for_each(extent<1>(particle_count), [=](index<1> idx) restrict(amp) {
 		int i = idx[0];
@@ -12,23 +13,26 @@ void render_entities(Entity* particles, unsigned int particle_count, unsigned in
 		switch (e.type)
 		{
 			case Type_Projectile:
-				render_circle(e, canvasView, canvas_w, canvas_h);
+				render_circle(cam, e, canvasView, canvas_w, canvas_h);
 				break;
 
 			case Type_Player:
-				render_triangle(e, canvasView, canvas_w, canvas_h);
+				render_triangle(cam, e, canvasView, canvas_w, canvas_h);
 				break;
 		}
 	});
 }
 
-void render_circle(Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
-	int radius = e.scale;
+void render_circle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
+	float scaled_radius = e.scale * camera.zoom;
+	int radius = static_cast<int>(scaled_radius + 0.5f);
+	float center_x = (e.x - camera.x) * camera.zoom + canvas_w / 2.0f;
+	float center_y = (e.y - camera.y) * camera.zoom + canvas_h / 2.0f;
 	for (int y = -radius; y <= radius; y++) {
 		for (int x = -radius; x <= radius; x++) {
-			if (x * x + y * y <= radius * radius) {
-				int px = e.x + x;
-				int py = e.y + y;
+			if (x * x + y * y <= scaled_radius * scaled_radius) {
+				int px = static_cast<int>(center_x + x);
+				int py = static_cast<int>(center_y + y);
 				if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
 					canvasView[py * canvas_w + px] = 0xFFFFFFFF;
 				}
@@ -37,17 +41,20 @@ void render_circle(Entity e, array_view<unsigned int, 1> canvasView, unsigned in
 	}
 }
 
-void render_triangle(Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
-	int half_base = e.scale;
-	int height = e.scale * 2;
+void render_triangle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
+	float scaled_scale = e.scale * camera.zoom;
+	int half_base = static_cast<int>(scaled_scale);
+	int height = static_cast<int>(scaled_scale * 2);
 	float angle_rad = -e.rotation * 3.14159265f / 180.0f;
 	float cos_a = cos(angle_rad);
 	float sin_a = sin(angle_rad);
 	for (int y = 0; y < height; y++) {
 		int row_width = (half_base * (height - y)) / height;
 		for (int x = -row_width; x <= row_width; x++) {
-			int px = e.x + static_cast<int>(x * cos_a - y * sin_a);
-			int py = e.y + static_cast<int>(x * sin_a + y * cos_a);
+			float world_x = e.x + x * cos_a - y * sin_a;
+			float world_y = e.y + x * sin_a + y * cos_a;
+			int px = static_cast<int>((world_x - camera.x) * camera.zoom + canvas_w / 2.0f);
+			int py = static_cast<int>((world_y - camera.y) * camera.zoom + canvas_h / 2.0f);
 			if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
 				canvasView[py * canvas_w + px] = 0xFFFFFFFF;
 			}

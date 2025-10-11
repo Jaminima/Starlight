@@ -6,9 +6,9 @@ namespace StarlightGame.GL
 {
     internal class Renderer
     {
-        public void RenderEntities(Entity[] entities, uint[] canvas, uint width, uint height)
+        public void RenderEntities(Camera camera,Entity[] entities, uint[] canvas, uint width, uint height)
         {
-            AmpSharp.RenderEntities(entities, canvas, width, height);
+            AmpSharp.RenderEntities(camera, entities, canvas, width, height);
         }
     }
 }

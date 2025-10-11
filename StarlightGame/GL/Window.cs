@@ -130,7 +130,7 @@ void main()
             Clear(ClearBufferMask.ColorBufferBit);
 
             var colors = new uint[ClientSize.X * ClientSize.Y];
-            renderer.RenderEntities(scene.Entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
+            renderer.RenderEntities(scene.Camera, scene.Entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
 
             BindTexture(TextureTarget.Texture2D, textureId);
             TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, colors);
