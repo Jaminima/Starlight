@@ -146,19 +146,43 @@ void main()
         {
             var keyboard = KeyboardState.GetSnapshot();
 
+            Entity player = scene.Entities[0];
+
             float speed = 200.0f * (float)e.Time;
-            if (keyboard.IsKeyDown(Keys.W)) scene.Entities[0].ApplyForwardForce(speed);
-            if (keyboard.IsKeyDown(Keys.S)) scene.Entities[0].ApplyBackwardForce(speed * 0.5f);
-            if (keyboard.IsKeyDown(Keys.A)) scene.Entities[0].ApplyLeftForce(speed * 0.15f);
-            if (keyboard.IsKeyDown(Keys.D)) scene.Entities[0].ApplyRightForce(speed * 0.15f);
+            if (keyboard.IsKeyDown(Keys.W)) player.ApplyForwardForce(speed);
+            if (keyboard.IsKeyDown(Keys.S)) player.ApplyBackwardForce(speed * 0.5f);
+            if (keyboard.IsKeyDown(Keys.A)) player.ApplyLeftForce(speed * 0.15f);
+            if (keyboard.IsKeyDown(Keys.D)) player.ApplyRightForce(speed * 0.15f);
 
             float rotSpeed = 50.0f * (float)e.Time;
-            if (keyboard.IsKeyDown(Keys.Q)) scene.Entities[0].RotationDeg -= rotSpeed;
-            if (keyboard.IsKeyDown(Keys.E)) scene.Entities[0].RotationDeg += rotSpeed;
+            if (keyboard.IsKeyDown(Keys.Q)) player.RotationDeg -= rotSpeed;
+            if (keyboard.IsKeyDown(Keys.E)) player.RotationDeg += rotSpeed;
+
+            if (keyboard.IsKeyDown(Keys.F))
+            {
+                float projSpeed = 500.0f;
+                float rad = player.RotationDeg * (float)Math.PI / 180.0f;
+                float vx = (float)Math.Sin(rad) * projSpeed;
+                float vy = (float)Math.Cos(rad) * projSpeed;
+                Entity proj = new Entity
+                {
+                    Layer = EntityLayer.Foreground,
+                    Type = EntityType.Projectile,
+                    Mass = 0.1f,
+                    Scale = 2,
+                    X = player.X,
+                    Y = player.Y,
+                    VX = vx + player.VX,
+                    VY = vy + player.VY,
+                };
+                scene.AddEntity(proj);
+            }
+
+            scene.Entities[0] = player;
 
             AmpSharp.UpdateEntities(scene.Entities, (float)e.Time);
 
-            scene.Camera.UpdateAttraction(scene.Entities[0], (float)e.Time);
+            scene.Camera.UpdateAttraction(player, (float)e.Time);
         }
     }
 }

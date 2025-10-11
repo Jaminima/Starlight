@@ -16,11 +16,11 @@ namespace StarlightGame.GL
         public Entity Player => Entities[0];
 
         public Scene() {
-            this.Entities = new Entity[1000];
+            this.Entities = new Entity[100000];
 
             this.InitPlayer();
 
-            this.RandomProjectiles(500);
+            //this.RandomProjectiles(90000);
         }
 
         private void InitPlayer()
@@ -50,8 +50,8 @@ namespace StarlightGame.GL
                     Type = EntityType.Projectile,
                     Mass = 0.1f,
                     Scale = 2,
-                    X = (float)(rand.NextDouble() * 2000 - 1000),
-                    Y = (float)(rand.NextDouble() * 2000 - 1000),
+                    X = (float)(rand.NextDouble() * 20000 - 10000),
+                    Y = (float)(rand.NextDouble() * 20000 - 10000),
                     //VX = (float)(rand.NextDouble() * 20 - 10),
                     //VY = (float)(rand.NextDouble() * 20 - 10),
                 };
