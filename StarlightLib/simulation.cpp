@@ -104,9 +104,11 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 	parallel_for_each(view.extent, [=](index<1> idx) restrict(amp) {
 		Entity e = view[idx];
 
+		// Integrate position
 		e.x += e.vx * dt;
 		e.y += e.vy * dt;
 
+		// Per-type update
 		switch (e.type) {
 		case EntityType::Type_Enemy:
 			update_enemy(e, player, dt);
@@ -117,21 +119,31 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 			break;
 		}
 
-		// Cap max speed
-		//float max_speed = 300.0f; // maximum speed
+        // Missile -> Player/Shield collision test in-kernel for efficiency
+        if (e.type == EntityType::Type_Missile)
+        {
+            const Entity p = player;
+            const bool shieldActive = p.lastEvent == EntityEvent::Event_Shields && p.eventTime + 5.0f > p.timeAlive;
+            const float playerRadius = p.scale;
+            const float shieldRadius = p.scale * 3.0f;
 
-		//switch (e.type)
-		//{
-		//	case EntityType::Type_Cannon:
-		//	case EntityType::Type_Missile:
-		//		max_speed = 500.0f;
-		//}
+            float d2 = dist2(e.x, e.y, p.x, p.y);
+            float missileR = e.scale;
 
-		//float current_speed = sqrt(e.vx * e.vx + e.vy * e.vy);
-		//if (current_speed > max_speed) {
-		//	e.vx = (e.vx / current_speed) * max_speed;
-		//	e.vy = (e.vy / current_speed) * max_speed;
-		//}
+            bool hitPlayer = d2 <= (playerRadius + missileR) * (playerRadius + missileR);
+            bool hitShield = false;
+            if (!hitPlayer && shieldActive)
+            {
+                hitShield = d2 <= (shieldRadius + missileR) * (shieldRadius + missileR);
+            }
+
+            if (hitPlayer || hitShield)
+            {
+                // Flag explosion and expire missile quickly via TTL
+                e.queuedEvent = EntityEvent::Event_Explosion;
+                e.timeToLive = 0.05f; // let host sweep it
+            }
+        }
 
 		view[idx] = e;
 	});

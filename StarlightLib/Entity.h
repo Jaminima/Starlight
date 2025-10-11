@@ -22,7 +22,8 @@ enum EntityEvent {
 	Event_FireCannon = 1,
 	Event_FireMissile = 2,
 	Event_Shields = 3,
-	Event_Die = 4
+	Event_Die = 4,
+    Event_Explosion = 5
 };
 
 #pragma pack(push, 4)
