@@ -10,22 +10,44 @@ namespace StarlightGame.GL
 {
     internal class Simulation
     {
+        private float ttlSweepTimer = 0.0f;
+        private const float TTL_SWEEP_INTERVAL = 1.0f;
+        private float enactTimer = 0.0f;
+        private const float ENACT_INTERVAL = 0.1f;
+
         public void SimulateEntities(Scene scene, float dt)
         {
+            // Update TimeAlive for all entities
+            for (int i = 0; i < scene.entityHead; i++)
+            {
+                scene.Entities[i].TimeAlive += dt;
+            }
+
             AmpSharp.UpdateEntities(scene.Entities, dt);
 
-            EnactEntityEvents(scene, dt);
+            ttlSweepTimer += dt;
+            bool doSweep = false;
+            if (ttlSweepTimer >= TTL_SWEEP_INTERVAL)
+            {
+                doSweep = true;
+                ttlSweepTimer -= TTL_SWEEP_INTERVAL;
+            }
+
+            enactTimer += dt;
+            if (enactTimer >= ENACT_INTERVAL)
+            {
+                EnactEntityEvents(scene, doSweep);
+                enactTimer -= ENACT_INTERVAL;
+            }
         }
 
-        private void EnactEntityEvents(Scene scene, float dt)
+        private void EnactEntityEvents(Scene scene, bool doSweep)
         {
             for (int i = 0; i < scene.entityHead; i++)
             {
                 Entity entity = scene.Entities[i];
 
-                entity.TimeAlive += dt;
-
-                if (entity.TimeToLive != 0)
+                if (doSweep && entity.TimeToLive != 0)
                 {
                     if (entity.TimeAlive >= entity.TimeToLive)
                     {
