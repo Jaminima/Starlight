@@ -26,7 +26,7 @@ enum EntityEvent {
     Event_Explosion = 5
 };
 
-#pragma pack(push, 4)
+#pragma pack(push, 8)
 struct Entity {
 	EntityLayer layer;
 	EntityType type;
@@ -40,5 +40,6 @@ struct Entity {
 	float scale;
 	float timeToLive;
 	float timeAlive;
+    int targetIndex;      // index into entities array for targeting; -1 if none
 };
 #pragma pack(pop)

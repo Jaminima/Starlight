@@ -8,7 +8,7 @@ namespace StarlightGame.GL
     {
         public void RenderEntities(Scene scene, uint[] canvas, uint width, uint height)
         {
-            AmpSharp.RenderEntities(scene.Camera, scene.Entities, scene.entityHead, canvas, width, height);
+            AmpSharp.RenderEntities(scene.Camera, scene.Entities, scene.entityHead, canvas, width, height, scene.CurrentTargetIndex);
         }
     }
 }

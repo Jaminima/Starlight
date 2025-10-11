@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "renderer.h"
 
-void render_entities(Camera* camera, Entity* entities, unsigned int entity_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
+void render_entities(Camera* camera, Entity* entities, unsigned int entity_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h, int targetIndex) {
 	array_view<Entity, 1> entityView(entity_count, entities);
 	array_view<unsigned int, 1> canvasView(canvas_w * canvas_h, canvas);
 	Camera cam = *camera;
@@ -41,6 +41,12 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
                 break;
             }
 		}
+
+        // If this entity is the current target, draw a red circle outline to highlight
+        if (targetIndex >= 0 && i == targetIndex)
+        {
+            render_circle_outline(cam, e, canvasView, canvas_w, canvas_h, 0xFFFF0000u);
+        }
 	});
 }
 
@@ -111,7 +117,7 @@ void render_explosion(Camera camera, Entity e, array_view<unsigned int, 1> canva
 	Entity exp = e;
 	exp.scale = e.scale * (1.0f + 3.0f * t);
 
-	// Fade colors by brightness
+	// Fade colors to black
 	float brightness = 1.0f - t;
 	// Base colors
 	unsigned int baseFill = 0xFFAA5500;    // orange

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StarlightGame.StarlightLib.Types
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal struct Entity
     {
         public EntityLayer Layer;
@@ -22,6 +22,7 @@ namespace StarlightGame.StarlightLib.Types
         public float Scale;
         public float TimeToLive;
         public float TimeAlive;
+        public int TargetIndex;   // index into Entities array for homing/targeting (-1 if none)
 
         public void ApplyForwardForce(float force)
         {

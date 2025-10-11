@@ -13,6 +13,9 @@ namespace StarlightGame.GL
         public Entity[] Entities;
         public uint entityHead = 0;
 
+        // Index into Entities[] of the current target; -1 if none
+        public int CurrentTargetIndex = -1;
+
         public Entity Player => Entities[0];
 
         public Scene() {
@@ -35,6 +38,7 @@ namespace StarlightGame.GL
                 Scale = 20,
                 X = 10,
                 Y = 10,
+                TargetIndex = -1,
             };
 
             this.Entities[0] = player;
@@ -54,6 +58,7 @@ namespace StarlightGame.GL
                     Scale = 5,
                     X = (float)(rand.NextDouble() * 20000 - 10000),
                     Y = (float)(rand.NextDouble() * 20000 - 10000),
+                    TargetIndex = -1,
                 };
                 AddEntity(enemy);
             }
@@ -72,9 +77,63 @@ namespace StarlightGame.GL
         {
             if (index < 0 || index >= entityHead)
                 return;
+
+            // If removing the current target, clear target selection
+            if (index == CurrentTargetIndex)
+            {
+                CurrentTargetIndex = -1;
+            }
+
             Entities[index] = Entities[entityHead - 1];
             Entities[entityHead - 1] = new Entity();
             entityHead--;
+        }
+
+        // Select the closest enemy in front of the player within a field-of-view
+        public void UpdateTargetSelection()
+        {
+            int bestIdx = -1;
+            float bestScore = float.MaxValue;
+            var player = Entities[0];
+
+            // Parameters
+            float maxDist = 5000.0f;
+            float fovDeg = 45.0f; // +/- from forward
+            float playerRad = player.RotationDeg * (float)Math.PI / 180.0f;
+            float fwdX = (float)Math.Sin(playerRad);
+            float fwdY = (float)Math.Cos(playerRad);
+
+            for (int i = 1; i < entityHead; i++)
+            {
+                var e = Entities[i];
+                if (e.Type != EntityType.Enemy)
+                    continue;
+
+                float dx = e.X - player.X;
+                float dy = e.Y - player.Y;
+                float dist2 = dx * dx + dy * dy;
+                if (dist2 <= 1e-4f) dist2 = 1e-4f;
+                float dist = (float)Math.Sqrt(dist2);
+                if (dist > maxDist)
+                    continue;
+
+                float dirX = dx / dist;
+                float dirY = dy / dist;
+                float dot = dirX * fwdX + dirY * fwdY; // cos(angle)
+                float angleDeg = (float)(Math.Acos(Math.Clamp(dot, -1.0f, 1.0f)) * 180.0 / Math.PI);
+                if (angleDeg > fovDeg)
+                    continue;
+
+                // Score by angle first then distance
+                float score = angleDeg * 1000.0f + dist;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestIdx = i;
+                }
+            }
+
+            CurrentTargetIndex = bestIdx;
         }
     }
 }

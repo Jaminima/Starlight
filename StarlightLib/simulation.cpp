@@ -50,12 +50,21 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
     }*/
 }
 
-void update_missile(Entity& e, const Entity& player, float dt) restrict(amp) {
-    // Calculate predicted position of the player
-    float dx = player.x - e.x;
-    float dy = player.y - e.y;
-    float rvx = player.vx - e.vx;
-    float rvy = player.vy - e.vy;
+inline Entity get_target_or_default(const array_view<Entity,1>& view, const Entity& self, const Entity& fallback) restrict(amp)
+{
+    if (self.targetIndex >= 0 && self.targetIndex < (int)view.extent[0])
+    {
+        return view[self.targetIndex];
+    }
+    return fallback;
+}
+
+void update_missile(Entity& e, const Entity& target, float dt) restrict(amp) {
+    // Calculate predicted position of the target
+    float dx = target.x - e.x;
+    float dy = target.y - e.y;
+    float rvx = target.vx - e.vx;
+    float rvy = target.vy - e.vy;
     float missile_speed = 500.0f; // assumed constant speed for prediction
     float a = rvx * rvx + rvy * rvy - missile_speed * missile_speed;
     float b = 2.0f * (dx * rvx + dy * rvy);
@@ -67,8 +76,8 @@ void update_missile(Entity& e, const Entity& player, float dt) restrict(amp) {
         float t2 = (-b + sqrt_disc) / (2.0f * a);
         float t = (t1 > 0.0f) ? t1 : t2;
         if (t > 0.0f) {
-            float pred_x = player.x + player.vx * t;
-            float pred_y = player.y + player.vy * t;
+            float pred_x = target.x + target.vx * t;
+            float pred_y = target.y + target.vy * t;
             dx = pred_x - e.x;
             dy = pred_y - e.y;
         }
@@ -115,33 +124,51 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 			break;
 			
 		case EntityType::Type_Missile:
-			update_missile(e, player, dt);
-			break;
+        {
+            // If missile has a target index, use that entity otherwise fallback to player
+            const Entity tgt = get_target_or_default(view, e, player);
+			update_missile(e, tgt, dt);
+            break;
+        }
 
 		case EntityType::Type_Cannon:
 			// Cannons fly straight, no update needed
 			break;
 		}
 
-        // Projectile -> Player/Shield collision test in-kernel for efficiency
+        // Collision tests
         if (e.type == EntityType::Type_Missile || e.type == EntityType::Type_Cannon)
         {
+            // Collision against player (existing)
             const Entity p = player;
             const bool shieldActive = p.lastEvent == EntityEvent::Event_Shields && p.eventTime + 5.0f > p.timeAlive;
             const float playerRadius = p.scale;
             const float shieldRadius = p.scale * 3.0f;
 
-            float d2 = dist2(e.x, e.y, p.x, p.y);
-            float missileR = e.scale;
+            float d2p = dist2(e.x, e.y, p.x, p.y);
+            float rProj = e.scale;
 
-            bool hitPlayer = d2 <= (playerRadius + missileR) * (playerRadius + missileR);
+            bool hitPlayer = d2p <= (playerRadius + rProj) * (playerRadius + rProj);
             bool hitShield = false;
             if (!hitPlayer && shieldActive)
             {
-                hitShield = d2 <= (shieldRadius + missileR) * (shieldRadius + missileR);
+                hitShield = d2p <= (shieldRadius + rProj) * (shieldRadius + rProj);
             }
 
-            if (hitPlayer || hitShield)
+            // Collision against enemies for player-fired missiles: check targetIndex when set
+            bool hitEnemy = false;
+            if (!hitPlayer && e.type == EntityType::Type_Missile && e.targetIndex > 0 && e.targetIndex < (int)view.extent[0])
+            {
+                const Entity tgt = view[e.targetIndex];
+                if (tgt.type == EntityType::Type_Enemy)
+                {
+                    float d2e = dist2(e.x, e.y, tgt.x, tgt.y);
+                    float rEnemy = tgt.scale;
+                    hitEnemy = d2e <= (rEnemy + rProj) * (rEnemy + rProj);
+                }
+            }
+
+            if (hitPlayer || hitShield || hitEnemy)
             {
                 // Flag explosion and expire missile quickly via TTL
                 e.queuedEvent = EntityEvent::Event_Explosion;

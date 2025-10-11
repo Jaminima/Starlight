@@ -83,7 +83,8 @@ namespace StarlightGame.GL
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 5.0f,
-                                RotationDeg = entity.RotationDeg
+                                RotationDeg = entity.RotationDeg,
+                                TargetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0,
                             };
                             scene.AddEntity(proj);
                             entity.EventTime = entity.TimeAlive;
@@ -112,7 +113,8 @@ namespace StarlightGame.GL
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 10.0f,
-                                RotationDeg = entity.RotationDeg
+                                RotationDeg = entity.RotationDeg,
+                                TargetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0,
                             };
                             scene.AddEntity(proj);
                             entity.EventTime = entity.TimeAlive;

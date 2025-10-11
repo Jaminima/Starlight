@@ -175,6 +175,8 @@ void main()
 
             scene.Entities[0] = player;
 
+            scene.UpdateTargetSelection();
+
             simulation.SimulateEntities(scene, (float)e.Time);
 
             scene.Camera.UpdateAttraction(player, (float)e.Time);
