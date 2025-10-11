@@ -44,9 +44,29 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
 }
 
 void update_missile(Entity& e, const Entity& player, float dt) restrict(amp) {
-    // Gradually turn towards the player and accelerate forward
+    // Calculate predicted position of the player
     float dx = player.x - e.x;
     float dy = player.y - e.y;
+    float rvx = player.vx - e.vx;
+    float rvy = player.vy - e.vy;
+    float missile_speed = 500.0f; // assumed constant speed for prediction
+    float a = rvx * rvx + rvy * rvy - missile_speed * missile_speed;
+    float b = 2.0f * (dx * rvx + dy * rvy);
+    float c = dx * dx + dy * dy;
+    float disc = b * b - 4.0f * a * c;
+    if (disc > 0.0f) {
+        float sqrt_disc = sqrt(disc);
+        float t1 = (-b - sqrt_disc) / (2.0f * a);
+        float t2 = (-b + sqrt_disc) / (2.0f * a);
+        float t = (t1 > 0.0f) ? t1 : t2;
+        if (t > 0.0f) {
+            float pred_x = player.x + player.vx * t;
+            float pred_y = player.y + player.vy * t;
+            dx = pred_x - e.x;
+            dy = pred_y - e.y;
+        }
+    }
+
     float dist = sqrt(dx * dx + dy * dy);
 
     float targetAngle = atan2(dx, dy) * 180.0f / 3.141592653589793f;
