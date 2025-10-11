@@ -10,15 +10,17 @@ enum EntityLayer {
 enum EntityType {
 	Type_Player = 0,
 	Type_Enemy = 1,
-	Type_Projectile = 2,
-	Type_Powerup = 3,
-	Type_Environment = 4
+	Type_Cannon = 2,
+	Type_Missile = 3,
+	Type_Powerup = 4,
+	Type_Environment = 5
 };
 
 enum EntityEvent {
 	Event_None = 0,
-	Event_FireWeapons = 1,
-	Event_Die = 2
+	Event_FireCannon = 1,
+	Event_FireMissile = 2,
+	Event_Die = 3
 };
 
 #pragma pack(push, 4)

@@ -162,7 +162,11 @@ void main()
 
             if (keyboard.IsKeyDown(Keys.F))
             {
-                player.QueuedEvent = EntityEvent.FireWeapons;
+                player.QueuedEvent = EntityEvent.FireCannon;
+            }
+            if (keyboard.IsKeyDown(Keys.G))
+            {
+                player.QueuedEvent = EntityEvent.FireMissile;
             }
 
             scene.Entities[0] = player;

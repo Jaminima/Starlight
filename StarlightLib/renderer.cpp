@@ -12,8 +12,12 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
 		
 		switch (e.type)
 		{
-			case Type_Projectile:
+			case Type_Cannon:
 				render_circle(cam, e, canvasView, canvas_w, canvas_h, 0xFF0000FF * (1.0f - (e.timeAlive / e.timeToLive)));
+				break;
+
+			case Type_Missile:
+				render_circle(cam, e, canvasView, canvas_w, canvas_h, 0xFFFFFF00);
 				break;
 
 			case Type_Player:

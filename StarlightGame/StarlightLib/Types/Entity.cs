@@ -60,7 +60,8 @@ namespace StarlightGame.StarlightLib.Types
     {
         Player,
         Enemy,
-        Projectile,
+        Cannon,
+        Missile,
         PowerUp,
         Environment,
     }
@@ -68,7 +69,8 @@ namespace StarlightGame.StarlightLib.Types
     internal enum EntityEvent
     {
         None,
-        FireWeapons,
+        FireCannon,
+        FireMissile,
         Die
     }
 }

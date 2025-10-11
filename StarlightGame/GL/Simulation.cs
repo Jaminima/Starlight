@@ -63,7 +63,7 @@ namespace StarlightGame.GL
                     case EntityEvent.None:
                         break;
 
-                    case EntityEvent.FireWeapons:
+                    case EntityEvent.FireCannon:
                         {
                             float projSpeed = 200.0f;
                             float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
@@ -72,19 +72,45 @@ namespace StarlightGame.GL
                             Entity proj = new Entity
                             {
                                 Layer = EntityLayer.Foreground,
-                                Type = EntityType.Projectile,
+                                Type = EntityType.Cannon,
                                 Mass = 0.1f,
                                 Scale = 2,
                                 X = entity.X,
                                 Y = entity.Y,
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
-                                TimeToLive = 5.0f
+                                TimeToLive = 5.0f,
+                                RotationDeg = entity.RotationDeg
                             };
                             scene.AddEntity(proj);
                             entity.QueuedEvent = EntityEvent.None;
                         }
                         break;
+
+                    case EntityEvent.FireMissile:
+                        {
+                            float projSpeed = 10.0f;
+                            float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
+                            float vx = (float)Math.Sin(rad) * projSpeed;
+                            float vy = (float)Math.Cos(rad) * projSpeed;
+                            Entity proj = new Entity
+                            {
+                                Layer = EntityLayer.Foreground,
+                                Type = EntityType.Missile,
+                                Mass = 0.2f,
+                                Scale = 3,
+                                X = entity.X,
+                                Y = entity.Y,
+                                VX = vx + entity.VX,
+                                VY = vy + entity.VY,
+                                TimeToLive = 10.0f,
+                                RotationDeg = entity.RotationDeg
+                            };
+                            scene.AddEntity(proj);
+                            entity.QueuedEvent = EntityEvent.None;
+                        }
+
+                        break;  
                 }
 
                 scene.Entities[i] = entity;
