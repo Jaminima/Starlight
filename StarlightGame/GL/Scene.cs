@@ -19,6 +19,8 @@ namespace StarlightGame.GL
             this.Entities = new Entity[1000];
 
             this.InitPlayer();
+
+            this.RandomProjectiles(500);
         }
 
         private void InitPlayer()
@@ -35,6 +37,26 @@ namespace StarlightGame.GL
 
             this.Entities[0] = player;
             entityHead = 1;
+        }
+
+        private void RandomProjectiles(int count)
+        {
+            Random rand = new Random();
+            for (int i = 0; i < count; i++)
+            {
+                Entity proj = new Entity
+                {
+                    Layer = EntityLayer.Foreground,
+                    Type = EntityType.Projectile,
+                    Mass = 0.1f,
+                    Scale = 2,
+                    X = (float)(rand.NextDouble() * 2000 - 1000),
+                    Y = (float)(rand.NextDouble() * 2000 - 1000),
+                    //VX = (float)(rand.NextDouble() * 20 - 10),
+                    //VY = (float)(rand.NextDouble() * 20 - 10),
+                };
+                AddEntity(proj);
+            }
         }
 
         public int AddEntity(Entity entity)

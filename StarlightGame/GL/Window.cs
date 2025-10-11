@@ -157,6 +157,8 @@ void main()
             if (keyboard.IsKeyDown(Keys.E)) scene.Entities[0].RotationDeg += rotSpeed;
 
             AmpSharp.UpdateEntities(scene.Entities, (float)e.Time);
+
+            scene.Camera.UpdateAttraction(scene.Entities[0], (float)e.Time);
         }
     }
 }
