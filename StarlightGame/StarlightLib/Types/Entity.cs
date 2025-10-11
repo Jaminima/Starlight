@@ -12,6 +12,7 @@ namespace StarlightGame.StarlightLib.Types
     {
         public EntityLayer Layer;
         public EntityType Type;
+        public EntityEvent LastEvent;
         public EntityEvent QueuedEvent;
         public float EventTime;
         public float X, Y;
@@ -72,6 +73,7 @@ namespace StarlightGame.StarlightLib.Types
         None,
         FireCannon,
         FireMissile,
+        Shields,
         Die
     }
 }

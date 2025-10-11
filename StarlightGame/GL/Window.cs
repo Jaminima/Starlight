@@ -168,6 +168,10 @@ void main()
             {
                 player.QueuedEvent = EntityEvent.FireMissile;
             }
+            if (keyboard.IsKeyDown(Keys.H))
+            {
+                player.QueuedEvent = EntityEvent.Shields;
+            }
 
             scene.Entities[0] = player;
 

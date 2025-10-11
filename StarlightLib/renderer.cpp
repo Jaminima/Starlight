@@ -22,6 +22,9 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
 
 			case Type_Player:
 				render_triangle(cam, e, canvasView, canvas_w, canvas_h, 0xFFFFFFFF);
+				if (e.lastEvent == EntityEvent::Event_Shields && e.eventTime + 5.0f > e.timeAlive) {
+					render_circle_outline(cam, e, canvasView, canvas_w, canvas_h, 0xFF00FFFF);
+				}
 				break;
 
 			case Type_Enemy:
@@ -29,6 +32,24 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
 				break;
 		}
 	});
+}
+
+void render_circle_outline(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h, unsigned int color) restrict(amp) {
+	float scaled_radius = e.scale * camera.zoom * 3;
+	int radius = static_cast<int>(scaled_radius + 0.5f);
+	float center_x = (e.x - camera.x) * camera.zoom + canvas_w / 2.0f;
+	float center_y = (e.y - camera.y) * camera.zoom + canvas_h / 2.0f;
+	for (int y = -radius; y <= radius; y++) {
+		for (int x = -radius; x <= radius; x++) {
+			if (x * x + y * y <= scaled_radius * scaled_radius && x * x + y * y >= (scaled_radius - 1) * (scaled_radius - 1)) {
+				int px = static_cast<int>(center_x + x);
+				int py = static_cast<int>(center_y + y);
+				if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
+					canvasView[py * canvas_w + px] = color;
+				}
+			}
+		}
+	}
 }
 
 void render_circle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h, unsigned int color) restrict(amp) {

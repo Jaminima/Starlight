@@ -20,13 +20,15 @@ enum EntityEvent {
 	Event_None = 0,
 	Event_FireCannon = 1,
 	Event_FireMissile = 2,
-	Event_Die = 3
+	Event_Shields = 3,
+	Event_Die = 4
 };
 
 #pragma pack(push, 4)
 struct Entity {
 	EntityLayer layer;
 	EntityType type;
+	EntityEvent lastEvent;
 	EntityEvent queuedEvent;
 	float eventTime;
 	float x, y; 

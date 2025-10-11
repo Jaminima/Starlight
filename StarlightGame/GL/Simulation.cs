@@ -86,6 +86,7 @@ namespace StarlightGame.GL
                                 };
                                 scene.AddEntity(proj);
                                 entity.EventTime = entity.TimeAlive;
+                                entity.LastEvent = entity.QueuedEvent;
                                 entity.QueuedEvent = EntityEvent.None;
                             }
                             break;
@@ -111,9 +112,17 @@ namespace StarlightGame.GL
                                 };
                                 scene.AddEntity(proj);
                                 entity.EventTime = entity.TimeAlive;
+                                entity.LastEvent = entity.QueuedEvent;
                                 entity.QueuedEvent = EntityEvent.None;
                             }
+                            break;
 
+                        case EntityEvent.Shields:
+                            {
+                                entity.EventTime = entity.TimeAlive;
+                                entity.LastEvent = entity.QueuedEvent;
+                                entity.QueuedEvent = EntityEvent.None;
+                            }
                             break;
                     }
                 }
