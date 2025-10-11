@@ -19,6 +19,7 @@ namespace StarlightGame.GL
         private int shaderProgram;
         private int vao, vbo;
         private Renderer renderer;
+        private Simulation simulation;
         private FPSTracker fpsTracker;
         private Scene scene;
 
@@ -31,6 +32,7 @@ namespace StarlightGame.GL
         {
             this.scene = scene;
             renderer = new Renderer();
+            simulation = new Simulation();
             fpsTracker = new FPSTracker();
         }
 
@@ -130,7 +132,7 @@ void main()
             Clear(ClearBufferMask.ColorBufferBit);
 
             var colors = new uint[ClientSize.X * ClientSize.Y];
-            renderer.RenderEntities(scene.Camera, scene.Entities, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
+            renderer.RenderEntities(scene, colors, (uint)ClientSize.X, (uint)ClientSize.Y);
 
             BindTexture(TextureTarget.Texture2D, textureId);
             TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, ClientSize.X, ClientSize.Y, 0, PixelFormat.Rgba, PixelType.UnsignedByte, colors);
@@ -148,7 +150,7 @@ void main()
 
             Entity player = scene.Entities[0];
 
-            float speed = 200.0f * (float)e.Time;
+            float speed = 20.0f * (float)e.Time;
             if (keyboard.IsKeyDown(Keys.W)) player.ApplyForwardForce(speed);
             if (keyboard.IsKeyDown(Keys.S)) player.ApplyBackwardForce(speed * 0.5f);
             if (keyboard.IsKeyDown(Keys.A)) player.ApplyLeftForce(speed * 0.15f);
@@ -160,27 +162,12 @@ void main()
 
             if (keyboard.IsKeyDown(Keys.F))
             {
-                float projSpeed = 500.0f;
-                float rad = player.RotationDeg * (float)Math.PI / 180.0f;
-                float vx = (float)Math.Sin(rad) * projSpeed;
-                float vy = (float)Math.Cos(rad) * projSpeed;
-                Entity proj = new Entity
-                {
-                    Layer = EntityLayer.Foreground,
-                    Type = EntityType.Projectile,
-                    Mass = 0.1f,
-                    Scale = 2,
-                    X = player.X,
-                    Y = player.Y,
-                    VX = vx + player.VX,
-                    VY = vy + player.VY,
-                };
-                scene.AddEntity(proj);
+                player.QueuedEvent = EntityEvent.FireWeapons;
             }
 
             scene.Entities[0] = player;
 
-            AmpSharp.UpdateEntities(scene.Entities, (float)e.Time);
+            simulation.SimulateEntities(scene, (float)e.Time);
 
             scene.Camera.UpdateAttraction(player, (float)e.Time);
         }

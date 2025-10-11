@@ -11,7 +11,7 @@ namespace StarlightGame.GL
     {
         public Camera Camera = new Camera() { X = 0, Y = 0, Zoom = 1.0f };
         public Entity[] Entities;
-        private int entityHead = 0;
+        public uint entityHead = 0;
 
         public Entity Player => Entities[0];
 
@@ -79,10 +79,10 @@ namespace StarlightGame.GL
             }
         }
 
-        public int AddEntity(Entity entity)
+        public uint AddEntity(Entity entity)
         {
             if (entityHead >= Entities.Length)
-                return -1;
+                return uint.MaxValue;
             Entities[entityHead] = entity;
             entityHead++;
             return entityHead - 1;

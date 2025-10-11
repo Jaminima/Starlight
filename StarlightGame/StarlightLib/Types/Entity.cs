@@ -12,11 +12,14 @@ namespace StarlightGame.StarlightLib.Types
     {
         public EntityLayer Layer;
         public EntityType Type;
+        public EntityEvent QueuedEvent;
         public float X, Y;
         public float VX, VY;
         public float Mass;
         public float RotationDeg;
         public float Scale;
+        public float TimeToLive;
+        public float TimeAlive;
 
         public void ApplyForwardForce(float force)
         {
@@ -60,5 +63,12 @@ namespace StarlightGame.StarlightLib.Types
         Projectile,
         PowerUp,
         Environment,
+    }
+
+    internal enum EntityEvent
+    {
+        None,
+        FireWeapons,
+        Die
     }
 }

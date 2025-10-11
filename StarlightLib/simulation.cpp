@@ -33,29 +33,39 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 
 			// Accelerate forward in the direction facing
 			float rad = e.rotation * 3.141592653589793f / 180.0f;
-			float accel = 100.0f; // acceleration forward
+			float accel = 10.0f; // acceleration forward
 			e.vx += sin(rad) * accel * dt;
 			e.vy += cos(rad) * accel * dt;
 
 			// Slow down on final approach
-			if (dist < 200.0f) {
+			if (dist < 500.0f) {
 				float speed = sqrt(e.vx * e.vx + e.vy * e.vy);
 				if (speed > 0.0f) {
 					float decel = 50.0f; // deceleration rate
 					e.vx -= (e.vx / speed) * decel * dt;
 					e.vy -= (e.vy / speed) * decel * dt;
 				}
-			}
 
-			// Cap max speed
-			float max_speed = 300.0f; // maximum speed
-			float current_speed = sqrt(e.vx * e.vx + e.vy * e.vy);
-			if (current_speed > max_speed) {
-				e.vx = (e.vx / current_speed) * max_speed;
-				e.vy = (e.vy / current_speed) * max_speed;
+				if (dist < 400.0f)
+					e.queuedEvent = EntityEvent::Event_FireWeapons;
 			}
 
 			break;
+		}
+
+		// Cap max speed
+		float max_speed = 300.0f; // maximum speed
+
+		switch (e.type)
+		{
+			case EntityType::Type_Projectile:
+				max_speed = 500.0f;
+		}
+
+		float current_speed = sqrt(e.vx * e.vx + e.vy * e.vy);
+		if (current_speed > max_speed) {
+			e.vx = (e.vx / current_speed) * max_speed;
+			e.vy = (e.vy / current_speed) * max_speed;
 		}
 
 		view[idx] = e;

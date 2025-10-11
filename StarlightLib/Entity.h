@@ -15,14 +15,23 @@ enum EntityType {
 	Type_Environment = 4
 };
 
+enum EntityEvent {
+	Event_None = 0,
+	Event_FireWeapons = 1,
+	Event_Die = 2
+};
+
 #pragma pack(push, 4)
 struct Entity {
 	EntityLayer layer;
 	EntityType type;
+	EntityEvent queuedEvent;
 	float x, y; 
 	float vx, vy; 
 	float mass; 
 	float rotation;
-	float scale; 
+	float scale;
+	float timeToLive;
+	float timeAlive;
 };
 #pragma pack(pop)

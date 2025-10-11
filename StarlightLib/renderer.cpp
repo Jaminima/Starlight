@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "renderer.h"
 
-void render_entities(Camera* camera, Entity* particles, unsigned int particle_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
-	array_view<Entity, 1> entityView(particle_count, particles);
+void render_entities(Camera* camera, Entity* entities, unsigned int entity_count, unsigned int* canvas, unsigned int canvas_w, unsigned int canvas_h) {
+	array_view<Entity, 1> entityView(entity_count, entities);
 	array_view<unsigned int, 1> canvasView(canvas_w * canvas_h, canvas);
 	Camera cam = *camera;
 
-	parallel_for_each(extent<1>(particle_count), [=](index<1> idx) restrict(amp) {
+	parallel_for_each(extent<1>(entity_count), [=](index<1> idx) restrict(amp) {
 		int i = idx[0];
 		Entity e = entityView[i];
 		
 		switch (e.type)
 		{
 			case Type_Projectile:
-				render_circle(cam, e, canvasView, canvas_w, canvas_h, 0xFF0000FF);
+				render_circle(cam, e, canvasView, canvas_w, canvas_h, 0xFF0000FF * (1.0f - (e.timeAlive / e.timeToLive)));
 				break;
 
 			case Type_Player:
