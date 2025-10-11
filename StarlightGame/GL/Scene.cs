@@ -21,6 +21,8 @@ namespace StarlightGame.GL
             this.InitPlayer();
 
             //this.RandomProjectiles(90000);
+
+            this.RandomEnemies(1000);
         }
 
         private void InitPlayer()
@@ -37,6 +39,24 @@ namespace StarlightGame.GL
 
             this.Entities[0] = player;
             entityHead = 1;
+        }
+
+        private void RandomEnemies(int count)
+        {
+            Random rand = new Random();
+            for (int i = 0; i < count; i++)
+            {
+                Entity enemy = new Entity
+                {
+                    Layer = EntityLayer.Foreground,
+                    Type = EntityType.Enemy,
+                    Mass = 1,
+                    Scale = 5,
+                    X = (float)(rand.NextDouble() * 20000 - 10000),
+                    Y = (float)(rand.NextDouble() * 20000 - 10000),
+                };
+                AddEntity(enemy);
+            }
         }
 
         private void RandomProjectiles(int count)

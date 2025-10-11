@@ -13,17 +13,21 @@ void render_entities(Camera* camera, Entity* particles, unsigned int particle_co
 		switch (e.type)
 		{
 			case Type_Projectile:
-				render_circle(cam, e, canvasView, canvas_w, canvas_h);
+				render_circle(cam, e, canvasView, canvas_w, canvas_h, 0xFF0000FF);
 				break;
 
 			case Type_Player:
-				render_triangle(cam, e, canvasView, canvas_w, canvas_h);
+				render_triangle(cam, e, canvasView, canvas_w, canvas_h, 0xFFFFFFFF);
+				break;
+
+			case Type_Enemy:
+				render_triangle(cam, e, canvasView, canvas_w, canvas_h, 0xFFFF00FF);
 				break;
 		}
 	});
 }
 
-void render_circle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
+void render_circle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h, unsigned int color) restrict(amp) {
 	float scaled_radius = e.scale * camera.zoom;
 	int radius = static_cast<int>(scaled_radius + 0.5f);
 	float center_x = (e.x - camera.x) * camera.zoom + canvas_w / 2.0f;
@@ -34,14 +38,14 @@ void render_circle(Camera camera, Entity e, array_view<unsigned int, 1> canvasVi
 				int px = static_cast<int>(center_x + x);
 				int py = static_cast<int>(center_y + y);
 				if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
-					canvasView[py * canvas_w + px] = 0xFFFFFFFF;
+					canvasView[py * canvas_w + px] = color;
 				}
 			}
 		}
 	}
 }
 
-void render_triangle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp) {
+void render_triangle(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h, unsigned int color) restrict(amp) {
 	float scaled_scale = e.scale * camera.zoom;
 	int half_base = static_cast<int>(scaled_scale);
 	int height = static_cast<int>(scaled_scale * 2);
@@ -56,7 +60,7 @@ void render_triangle(Camera camera, Entity e, array_view<unsigned int, 1> canvas
 			int px = static_cast<int>((world_x - camera.x) * camera.zoom + canvas_w / 2.0f);
 			int py = static_cast<int>((world_y - camera.y) * camera.zoom + canvas_h / 2.0f);
 			if (px >= 0 && px < canvas_w && py >= 0 && py < canvas_h) {
-				canvasView[py * canvas_w + px] = 0xFFFFFFFF;
+				canvasView[py * canvas_w + px] = color;
 			}
 		}
 	}

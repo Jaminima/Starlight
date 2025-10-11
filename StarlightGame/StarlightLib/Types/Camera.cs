@@ -32,6 +32,7 @@ namespace StarlightGame.StarlightLib.Types
                 VX += dirX * forceMag * deltaTime;
                 VY += dirY * forceMag * deltaTime;
             }
+
             // Damping
             VX *= 0.98f;
             VY *= 0.98f;
