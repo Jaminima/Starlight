@@ -29,6 +29,9 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
 
 			case Type_Enemy:
 				render_triangle(cam, e, canvasView, canvas_w, canvas_h, 0xFFFF00FF);
+				if (e.lastEvent == EntityEvent::Event_Shields && e.eventTime + 5.0f > e.timeAlive) {
+					render_circle_outline(cam, e, canvasView, canvas_w, canvas_h, 0xFF00FFFF);
+				}
 				break;
 		}
 	});

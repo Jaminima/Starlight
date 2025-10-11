@@ -36,10 +36,17 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
             e.vx -= (e.vx / speed) * decel * dt;
             e.vy -= (e.vy / speed) * decel * dt;
         }
+    }
 
-        if (dist < 400.0f) {
-            e.queuedEvent = EntityEvent::Event_FireMissile;
-        }
+    // Events
+    if (dist < 400.0f) {
+        e.queuedEvent = EntityEvent::Event_FireCannon;
+    }
+    else if (dist < 700.0f) {
+        e.queuedEvent = EntityEvent::Event_FireMissile;
+    }
+    else {
+        e.queuedEvent = EntityEvent::Event_Shields;
     }
 }
 

@@ -150,7 +150,7 @@ void main()
 
             Entity player = scene.Entities[0];
 
-            float speed = 20.0f * (float)e.Time;
+            float speed = 50.0f * (float)e.Time;
             if (keyboard.IsKeyDown(Keys.W)) player.ApplyForwardForce(speed);
             if (keyboard.IsKeyDown(Keys.S)) player.ApplyBackwardForce(speed * 0.5f);
             if (keyboard.IsKeyDown(Keys.A)) player.ApplyLeftForce(speed * 0.15f);

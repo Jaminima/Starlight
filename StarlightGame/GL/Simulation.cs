@@ -57,74 +57,80 @@ namespace StarlightGame.GL
                     }
                 }
 
-                if (entity.EventTime + 2.0f < entity.TimeAlive)
+                switch (entity.QueuedEvent)
                 {
-                    switch (entity.QueuedEvent)
-                    {
-                        default:
-                        case EntityEvent.None:
-                            break;
+                    default:
+                    case EntityEvent.None:
+                        break;
 
-                        case EntityEvent.FireCannon:
-                            {
-                                float projSpeed = 200.0f;
-                                float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
-                                float vx = (float)Math.Sin(rad) * projSpeed;
-                                float vy = (float)Math.Cos(rad) * projSpeed;
-                                Entity proj = new Entity
-                                {
-                                    Layer = EntityLayer.Foreground,
-                                    Type = EntityType.Cannon,
-                                    Mass = 0.1f,
-                                    Scale = 2,
-                                    X = entity.X,
-                                    Y = entity.Y,
-                                    VX = vx + entity.VX,
-                                    VY = vy + entity.VY,
-                                    TimeToLive = 5.0f,
-                                    RotationDeg = entity.RotationDeg
-                                };
-                                scene.AddEntity(proj);
-                                entity.EventTime = entity.TimeAlive;
-                                entity.LastEvent = entity.QueuedEvent;
-                                entity.QueuedEvent = EntityEvent.None;
-                            }
-                            break;
+                    case EntityEvent.FireCannon:
+                        {
+                            if (entity.EventTime + 0.2f > entity.TimeAlive)
+                                break;
 
-                        case EntityEvent.FireMissile:
+                            float projSpeed = 200.0f;
+                            float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
+                            float vx = (float)Math.Sin(rad) * projSpeed;
+                            float vy = (float)Math.Cos(rad) * projSpeed;
+                            Entity proj = new Entity
                             {
-                                float projSpeed = 100.0f;
-                                float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
-                                float vx = (float)Math.Sin(rad) * projSpeed;
-                                float vy = (float)Math.Cos(rad) * projSpeed;
-                                Entity proj = new Entity
-                                {
-                                    Layer = EntityLayer.Foreground,
-                                    Type = EntityType.Missile,
-                                    Mass = 0.2f,
-                                    Scale = 3,
-                                    X = entity.X,
-                                    Y = entity.Y,
-                                    VX = vx + entity.VX,
-                                    VY = vy + entity.VY,
-                                    TimeToLive = 10.0f,
-                                    RotationDeg = entity.RotationDeg
-                                };
-                                scene.AddEntity(proj);
-                                entity.EventTime = entity.TimeAlive;
-                                entity.LastEvent = entity.QueuedEvent;
-                                entity.QueuedEvent = EntityEvent.None;
-                            }
-                            break;
+                                Layer = EntityLayer.Foreground,
+                                Type = EntityType.Cannon,
+                                Mass = 0.1f,
+                                Scale = 2,
+                                X = entity.X,
+                                Y = entity.Y,
+                                VX = vx + entity.VX,
+                                VY = vy + entity.VY,
+                                TimeToLive = 5.0f,
+                                RotationDeg = entity.RotationDeg
+                            };
+                            scene.AddEntity(proj);
+                            entity.EventTime = entity.TimeAlive;
+                            entity.LastEvent = entity.QueuedEvent;
+                            entity.QueuedEvent = EntityEvent.None;
+                        }
+                        break;
 
-                        case EntityEvent.Shields:
+                    case EntityEvent.FireMissile:
+                        {
+                            if (entity.EventTime + 2.5f > entity.TimeAlive)
+                                break;
+
+                            float projSpeed = 100.0f;
+                            float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
+                            float vx = (float)Math.Sin(rad) * projSpeed;
+                            float vy = (float)Math.Cos(rad) * projSpeed;
+                            Entity proj = new Entity
                             {
-                                entity.EventTime = entity.TimeAlive;
-                                entity.LastEvent = entity.QueuedEvent;
-                                entity.QueuedEvent = EntityEvent.None;
-                            }
-                            break;
-                    }
+                                Layer = EntityLayer.Foreground,
+                                Type = EntityType.Missile,
+                                Mass = 0.2f,
+                                Scale = 3,
+                                X = entity.X,
+                                Y = entity.Y,
+                                VX = vx + entity.VX,
+                                VY = vy + entity.VY,
+                                TimeToLive = 10.0f,
+                                RotationDeg = entity.RotationDeg
+                            };
+                            scene.AddEntity(proj);
+                            entity.EventTime = entity.TimeAlive;
+                            entity.LastEvent = entity.QueuedEvent;
+                            entity.QueuedEvent = EntityEvent.None;
+                        }
+                        break;
+
+                    case EntityEvent.Shields:
+                        {
+                            if (entity.EventTime + 5.0f < entity.TimeAlive)
+                                break;
+
+                            entity.EventTime = entity.TimeAlive;
+                            entity.LastEvent = entity.QueuedEvent;
+                            entity.QueuedEvent = EntityEvent.None;
+                        }
+                        break;
                 }
 
                 scene.Entities[i] = entity;
