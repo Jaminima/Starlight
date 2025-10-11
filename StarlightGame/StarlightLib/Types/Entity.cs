@@ -75,6 +75,7 @@ namespace StarlightGame.StarlightLib.Types
         FireCannon,
         FireMissile,
         Shields,
-        Die
+        Die,
+        Explosion
     }
 }

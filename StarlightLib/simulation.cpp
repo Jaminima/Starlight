@@ -117,10 +117,14 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 		case EntityType::Type_Missile:
 			update_missile(e, player, dt);
 			break;
+
+		case EntityType::Type_Cannon:
+			// Cannons fly straight, no update needed
+			break;
 		}
 
-        // Missile -> Player/Shield collision test in-kernel for efficiency
-        if (e.type == EntityType::Type_Missile)
+        // Projectile -> Player/Shield collision test in-kernel for efficiency
+        if (e.type == EntityType::Type_Missile || e.type == EntityType::Type_Cannon)
         {
             const Entity p = player;
             const bool shieldActive = p.lastEvent == EntityEvent::Event_Shields && p.eventTime + 5.0f > p.timeAlive;
