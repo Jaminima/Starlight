@@ -22,7 +22,7 @@ namespace StarlightGame.GL
 
             //this.RandomProjectiles(90000);
 
-            this.RandomEnemies(1000);
+            this.RandomEnemies(100);
         }
 
         private void InitPlayer()
@@ -32,7 +32,7 @@ namespace StarlightGame.GL
                 Layer = EntityLayer.Foreground,
                 Type = EntityType.Player,
                 Mass = 1,
-                Scale = 10,
+                Scale = 20,
                 X = 10,
                 Y = 10,
             };

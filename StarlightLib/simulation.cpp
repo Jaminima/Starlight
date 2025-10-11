@@ -39,15 +39,15 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
     }
 
     // Events
-    if (dist < 400.0f) {
+   /* if (dist < 400.0f) {
         e.queuedEvent = EntityEvent::Event_FireCannon;
-    }
-    else if (dist < 700.0f) {
+    }*/
+    if (dist < 700.0f) {
         e.queuedEvent = EntityEvent::Event_FireMissile;
     }
-    else {
+    /*else {
         e.queuedEvent = EntityEvent::Event_Shields;
-    }
+    }*/
 }
 
 void update_missile(Entity& e, const Entity& player, float dt) restrict(amp) {
@@ -82,7 +82,7 @@ void update_missile(Entity& e, const Entity& player, float dt) restrict(amp) {
     while (angleDiff > 180.0f) angleDiff -= 360.0f;
     while (angleDiff < -180.0f) angleDiff += 360.0f;
 
-    float turnSpeed = 90.0f; // degrees per second
+    float turnSpeed = 180.0f; // degrees per second
     float turnAmount = turnSpeed * dt;
     if (fabs(angleDiff) < turnAmount) {
         e.rotation = targetAngle;
