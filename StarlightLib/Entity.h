@@ -28,6 +28,7 @@ struct Entity {
 	EntityLayer layer;
 	EntityType type;
 	EntityEvent queuedEvent;
+	float eventTime;
 	float x, y; 
 	float vx, vy; 
 	float mass; 

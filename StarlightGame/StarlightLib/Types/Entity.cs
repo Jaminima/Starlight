@@ -13,6 +13,7 @@ namespace StarlightGame.StarlightLib.Types
         public EntityLayer Layer;
         public EntityType Type;
         public EntityEvent QueuedEvent;
+        public float EventTime;
         public float X, Y;
         public float VX, VY;
         public float Mass;

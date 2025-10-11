@@ -37,8 +37,9 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
             e.vy -= (e.vy / speed) * decel * dt;
         }
 
-        if (dist < 400.0f)
+        if (dist < 400.0f) {
             e.queuedEvent = EntityEvent::Event_FireMissile;
+        }
     }
 }
 
@@ -90,20 +91,20 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 		}
 
 		// Cap max speed
-		float max_speed = 300.0f; // maximum speed
+		//float max_speed = 300.0f; // maximum speed
 
-		switch (e.type)
-		{
-			case EntityType::Type_Cannon:
-			case EntityType::Type_Missile:
-				max_speed = 500.0f;
-		}
+		//switch (e.type)
+		//{
+		//	case EntityType::Type_Cannon:
+		//	case EntityType::Type_Missile:
+		//		max_speed = 500.0f;
+		//}
 
-		float current_speed = sqrt(e.vx * e.vx + e.vy * e.vy);
-		if (current_speed > max_speed) {
-			e.vx = (e.vx / current_speed) * max_speed;
-			e.vy = (e.vy / current_speed) * max_speed;
-		}
+		//float current_speed = sqrt(e.vx * e.vx + e.vy * e.vy);
+		//if (current_speed > max_speed) {
+		//	e.vx = (e.vx / current_speed) * max_speed;
+		//	e.vy = (e.vy / current_speed) * max_speed;
+		//}
 
 		view[idx] = e;
 	});
