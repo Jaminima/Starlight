@@ -66,6 +66,7 @@ namespace StarlightGame.StarlightLib.Types
         Missile,
         PowerUp,
         Environment,
+        Explosion,
     }
 
     internal enum EntityEvent

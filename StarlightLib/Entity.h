@@ -13,7 +13,8 @@ enum EntityType {
 	Type_Cannon = 2,
 	Type_Missile = 3,
 	Type_Powerup = 4,
-	Type_Environment = 5
+	Type_Environment = 5,
+	Type_Explosion = 6
 };
 
 enum EntityEvent {

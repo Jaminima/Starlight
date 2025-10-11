@@ -25,6 +25,9 @@ namespace StarlightGame.GL
 
             AmpSharp.UpdateEntities(scene.Entities, dt);
 
+            // CPU-side collision: missiles with player or active shield
+            HandleMissileCollisions(scene);
+
             ttlSweepTimer += dt;
             bool doSweep = false;
             if (ttlSweepTimer >= TTL_SWEEP_INTERVAL)
@@ -39,6 +42,64 @@ namespace StarlightGame.GL
                 EnactEntityEvents(scene, doSweep);
                 enactTimer -= ENACT_INTERVAL;
             }
+        }
+
+        private void HandleMissileCollisions(Scene scene)
+        {
+            if (scene.entityHead == 0) return;
+
+            ref var player = ref scene.Entities[0];
+            bool shieldActive = player.LastEvent == EntityEvent.Shields && player.EventTime + 5.0f > player.TimeAlive;
+            float playerRadius = player.Scale;
+            float shieldRadius = player.Scale * 3.0f; // must match renderer circle outline radius multiplier
+
+            for (int i = 1; i < scene.entityHead; i++)
+            {
+                ref var e = ref scene.Entities[i];
+                if (e.Type != EntityType.Missile) continue;
+
+                float dx = e.X - player.X;
+                float dy = e.Y - player.Y;
+                float dist2 = dx * dx + dy * dy;
+
+                float collisionRadius = playerRadius + e.Scale;
+                bool hitPlayer = dist2 <= collisionRadius * collisionRadius;
+
+                bool hitShield = false;
+                if (!hitPlayer && shieldActive)
+                {
+                    float shieldCollision = shieldRadius + e.Scale;
+                    hitShield = dist2 <= shieldCollision * shieldCollision;
+                }
+
+                if (hitPlayer || hitShield)
+                {
+                    // Spawn explosion entity
+                    var explosion = new Entity
+                    {
+                        Layer = EntityLayer.Foreground,
+                        Type = EntityType.Explosion,
+                        Scale = e.Scale * 2.0f,
+                        X = e.X,
+                        Y = e.Y,
+                        TimeToLive = 0.6f,
+                        RotationDeg = 0,
+                    };
+                    scene.AddEntity(explosion);
+
+                    // Remove the missile
+                    scene.RemoveEntity(i);
+                    i--; // adjust index after removal
+
+                    // If not shielded, kill the player (optional: set die event)
+                    if (hitPlayer && !shieldActive)
+                    {
+                        player.QueuedEvent = EntityEvent.Die;
+                    }
+                }
+            }
+
+            scene.Entities[0] = player;
         }
 
         private void EnactEntityEvents(Scene scene, bool doSweep)
@@ -126,6 +187,28 @@ namespace StarlightGame.GL
                             if (entity.EventTime + 5.0f < entity.TimeAlive)
                                 break;
 
+                            entity.EventTime = entity.TimeAlive;
+                            entity.LastEvent = entity.QueuedEvent;
+                            entity.QueuedEvent = EntityEvent.None;
+                        }
+                        break;
+
+                    case EntityEvent.Die:
+                        {
+                            // Spawn explosion for death and remove entity quickly
+                            var explosion = new Entity
+                            {
+                                Layer = EntityLayer.Foreground,
+                                Type = EntityType.Explosion,
+                                Scale = entity.Scale * 2.0f,
+                                X = entity.X,
+                                Y = entity.Y,
+                                TimeToLive = 0.7f,
+                            };
+                            scene.AddEntity(explosion);
+
+                            // For now, just clear TTL to remove on next sweep
+                            entity.TimeToLive = 0.1f;
                             entity.EventTime = entity.TimeAlive;
                             entity.LastEvent = entity.QueuedEvent;
                             entity.QueuedEvent = EntityEvent.None;

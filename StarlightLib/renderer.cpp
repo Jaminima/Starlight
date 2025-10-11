@@ -33,6 +33,12 @@ void render_entities(Camera* camera, Entity* entities, unsigned int entity_count
 					render_circle_outline(cam, e, canvasView, canvas_w, canvas_h, 0xFF00FFFF);
 				}
 				break;
+
+            case Type_Explosion:
+            {
+                render_explosion(cam, e, canvasView, canvas_w, canvas_h);
+                break;
+            }
 		}
 	});
 }
@@ -92,4 +98,40 @@ void render_triangle(Camera camera, Entity e, array_view<unsigned int, 1> canvas
 			}
 		}
 	}
+}
+
+void render_explosion(Camera camera, Entity e, array_view<unsigned int, 1> canvasView, unsigned int canvas_w, unsigned int canvas_h) restrict(amp)
+{
+	float ttl = e.timeToLive > 0.01f ? e.timeToLive : 0.5f;
+	float t = e.timeAlive / ttl; // 0..1
+	if (t < 0.0f) t = 0.0f; if (t > 1.0f) t = 1.0f;
+
+	// Expand scale over time
+	Entity exp = e;
+	exp.scale = e.scale * (1.0f + 3.0f * t);
+
+	// Fade colors by brightness
+	float brightness = 1.0f - t;
+	// Base colors
+	unsigned int baseFill = 0xFFAA5500;    // orange
+	unsigned int baseOutline = 0xFFFFFF00; // yellow
+	unsigned int fillColor = scale_color(baseFill, brightness);
+	unsigned int outlineColor = scale_color(baseOutline, brightness);
+
+	render_circle(camera, exp, canvasView, canvas_w, canvas_h, fillColor);
+	render_circle_outline(camera, exp, canvasView, canvas_w, canvas_h, outlineColor);
+}
+
+unsigned int scale_color(unsigned int color, float brightness) restrict(amp)
+{
+	if (brightness < 0.0f) brightness = 0.0f;
+	if (brightness > 1.0f) brightness = 1.0f;
+	unsigned int a = (color >> 24) & 0xFFu;
+	unsigned int r = (color >> 16) & 0xFFu;
+	unsigned int g = (color >> 8) & 0xFFu;
+	unsigned int b = (color) & 0xFFu;
+	r = (unsigned int)(r * brightness);
+	g = (unsigned int)(g * brightness);
+	b = (unsigned int)(b * brightness);
+	return (a << 24) | (r << 16) | (g << 8) | b;
 }
