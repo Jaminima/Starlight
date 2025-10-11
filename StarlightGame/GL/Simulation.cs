@@ -72,14 +72,17 @@ namespace StarlightGame.GL
                             float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
+                            float offset = entity.Scale * 1.0f;
+                            float offsetX = (float)Math.Sin(rad) * offset;
+                            float offsetY = (float)Math.Cos(rad) * offset;
                             Entity proj = new Entity
                             {
                                 Layer = EntityLayer.Foreground,
                                 Type = EntityType.Cannon,
                                 Mass = 0.1f,
                                 Scale = 2,
-                                X = entity.X,
-                                Y = entity.Y,
+                                X = entity.X + offsetX,
+                                Y = entity.Y + offsetY,
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 5.0f,
@@ -102,14 +105,17 @@ namespace StarlightGame.GL
                             float rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
+                            float offset = entity.Scale * 1.2f;
+                            float offsetX = (float)Math.Sin(rad) * offset;
+                            float offsetY = (float)Math.Cos(rad) * offset;
                             Entity proj = new Entity
                             {
                                 Layer = EntityLayer.Foreground,
                                 Type = EntityType.Missile,
                                 Mass = 0.2f,
                                 Scale = 3,
-                                X = entity.X,
-                                Y = entity.Y,
+                                X = entity.X + offsetX,
+                                Y = entity.Y + offsetY,
                                 VX = vx + entity.VX,
                                 VY = vy + entity.VY,
                                 TimeToLive = 10.0f,
