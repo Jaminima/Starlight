@@ -25,7 +25,7 @@ namespace StarlightGame.GL
 
             //this.RandomProjectiles(90000);
 
-            this.RandomEnemies(100);
+            this.RandomEnemies(200);
         }
 
         private void InitPlayer()
@@ -97,8 +97,8 @@ namespace StarlightGame.GL
             var player = Entities[0];
 
             // Parameters
-            float maxDist = 5000.0f;
-            float fovDeg = 45.0f; // +/- from forward
+            float maxDist = 800.0f;
+            float fovDeg = 70.0f; // +/- from forward
             float playerRad = player.RotationDeg * (float)Math.PI / 180.0f;
             float fwdX = (float)Math.Sin(playerRad);
             float fwdY = (float)Math.Cos(playerRad);
@@ -126,6 +126,13 @@ namespace StarlightGame.GL
 
                 // Score by angle first then distance
                 float score = angleDeg * 1000.0f + dist;
+
+                // Add hysteresis: prefer current target by reducing its score
+                if (i == CurrentTargetIndex)
+                {
+                    score -= 500.0f; // Bonus to keep current target
+                }
+
                 if (score < bestScore)
                 {
                     bestScore = score;
