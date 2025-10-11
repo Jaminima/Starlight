@@ -12,7 +12,7 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 
 		switch (e.type) {
 		case EntityType::Type_Enemy:
-			// Steadily turn towards the player
+			// Gradually turn towards the player and accelerate forward
 			float dx = player.x - e.x;
 			float dy = player.y - e.y;
 
@@ -24,11 +24,17 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 
 			float turnSpeed = 90.0f; // degrees per second
 			float turnAmount = turnSpeed * dt;
-			if (fabsf(angleDiff) < turnAmount) {
+			if (fabs(angleDiff) < turnAmount) {
 				e.rotation = targetAngle;
 			} else {
 				e.rotation += (angleDiff > 0.0f ? 1.0f : -1.0f) * turnAmount;
 			}
+
+			// Accelerate forward in the direction facing
+			float rad = e.rotation * 3.141592653589793f / 180.0f;
+			float accel = 100.0f; // acceleration forward
+			e.vx += sin(rad) * accel * dt;
+			e.vy += cos(rad) * accel * dt;
 
 			break;
 		}
