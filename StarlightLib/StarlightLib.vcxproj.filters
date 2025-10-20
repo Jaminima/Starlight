@@ -32,6 +32,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
+    <ClInclude Include="weapons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

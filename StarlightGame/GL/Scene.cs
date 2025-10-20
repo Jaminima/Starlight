@@ -9,7 +9,7 @@ namespace StarlightGame.GL
 {
     internal class Scene
     {
-        public Camera Camera = new Camera() { X = 0, Y = 0, Zoom = 1.0f };
+        public Camera Camera = new Camera() { X = 0, Y = 0, Zoom = 0.5f };
         public Entity[] Entities;
         public uint entityHead = 0;
 
@@ -25,7 +25,7 @@ namespace StarlightGame.GL
 
             //this.RandomProjectiles(90000);
 
-            this.RandomEnemies(20);
+            this.RandomEnemies(1);
         }
 
         private void InitPlayer()
@@ -55,9 +55,9 @@ namespace StarlightGame.GL
                     Layer = EntityLayer.Foreground,
                     Type = EntityType.Enemy,
                     Mass = 1,
-                    Scale = 5,
-                    X = (float)(rand.NextDouble() * 10000 - 5000),
-                    Y = (float)(rand.NextDouble() * 10000 - 5000),
+                    Scale = 8,
+                    X = (float)(rand.NextDouble() * 1000 - 500),
+                    Y = (float)(rand.NextDouble() * 1000 - 500),
                     TargetIndex = -1,
                 };
                 AddEntity(enemy);
@@ -97,7 +97,7 @@ namespace StarlightGame.GL
             var player = Entities[0];
 
             // Parameters
-            float maxDist = 800.0f;
+            float maxDist = 1500.0f;
             float fovDeg = 70.0f; // +/- from forward
             float playerRad = player.RotationDeg * (float)Math.PI / 180.0f;
             float fwdX = (float)Math.Sin(playerRad);

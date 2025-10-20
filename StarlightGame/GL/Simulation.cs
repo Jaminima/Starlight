@@ -69,13 +69,11 @@ namespace StarlightGame.GL
                                 break;
 
                             float rad;
-                            int targetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0;
+                            int targetIndex = Weapons.ResolveTargetIndex(scene, entity);
                             if (targetIndex >= 0 && targetIndex < scene.entityHead)
                             {
                                 var target = scene.Entities[targetIndex];
-                                float dx = target.X - entity.X;
-                                float dy = target.Y - entity.Y;
-                                rad = (float)Math.Atan2(dx, dy);
+                                rad = Weapons.ComputeDirectAimAngle(entity, target);
                             }
                             else
                             {
@@ -115,23 +113,22 @@ namespace StarlightGame.GL
                                 break;
 
                             float rad;
-                            int targetIndex = entity.Type == EntityType.Player ? scene.CurrentTargetIndex : 0;
+                            int targetIndex = Weapons.ResolveTargetIndex(scene, entity);
+                            float projSpeed = 100.0f;
                             if (targetIndex >= 0 && targetIndex < scene.entityHead)
                             {
                                 var target = scene.Entities[targetIndex];
-                                float dx = target.X - entity.X;
-                                float dy = target.Y - entity.Y;
-                                rad = (float)Math.Atan2(dx, dy);
+                                rad = Weapons.ComputeLeadAimAngle(entity, target, projSpeed);
                             }
                             else
                             {
+                                // No valid target; fire forward
                                 rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             }
 
-                            float projSpeed = 100.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
-                            float offset = entity.Scale * 1.2f;
+                            float offset = entity.Scale * 1.8f;
                             float offsetX = (float)Math.Sin(rad) * offset;
                             float offsetY = (float)Math.Cos(rad) * offset;
                             Entity proj = new Entity

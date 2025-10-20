@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "simulation.h"
+#include "weapons.h"
 
 void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
     // Gradually turn towards the player and accelerate forward, slowing down on final approach
@@ -7,24 +8,17 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
     float dy = player.y - e.y;
     float dist = sqrt(dx * dx + dy * dy);
 
-    float targetAngle = atan2(dx, dy) * 180.0f / 3.141592653589793f;
+    float targetAngle = compute_direct_aim_angle(e, player);
 
-    float angleDiff = targetAngle - e.rotation;
-    while (angleDiff > 180.0f) angleDiff -= 360.0f;
-    while (angleDiff < -180.0f) angleDiff += 360.0f;
-
-    float turnSpeed = 90.0f; // degrees per second
-    float turnAmount = turnSpeed * dt;
-    if (fabs(angleDiff) < turnAmount) {
-        e.rotation = targetAngle;
-    }
-    else {
-        e.rotation += (angleDiff > 0.0f ? 1.0f : -1.0f) * turnAmount;
-    }
+    // Turn towards target with a max turn speed
+    const float turnSpeed = 90.0f; // degrees per second
+    const float turnAmount = turnSpeed * dt;
+    // turn_towards_deg implemented in weapons.h
+    e.rotation = turn_towards_deg(e.rotation, targetAngle, turnAmount);
 
     // Accelerate forward in the direction facing
     float rad = e.rotation * 3.141592653589793f / 180.0f;
-    float accel = 10.0f; // acceleration forward
+    float accel = 50.0f; // acceleration forward
     e.vx += sin(rad) * accel * dt;
     e.vy += cos(rad) * accel * dt;
 
@@ -60,51 +54,34 @@ inline Entity get_target_or_default(const array_view<Entity,1>& view, const Enti
 }
 
 void update_missile(Entity& e, const Entity& target, float dt) restrict(amp) {
-    // Calculate predicted position of the target
-    float dx = target.x - e.x;
-    float dy = target.y - e.y;
-    float rvx = target.vx - e.vx;
-    float rvy = target.vy - e.vy;
-    float missile_speed = 500.0f; // assumed constant speed for prediction
-    float a = rvx * rvx + rvy * rvy - missile_speed * missile_speed;
-    float b = 2.0f * (dx * rvx + dy * rvy);
-    float c = dx * dx + dy * dy;
-    float disc = b * b - 4.0f * a * c;
-    if (disc > 0.0f) {
-        float sqrt_disc = sqrt(disc);
-        float t1 = (-b - sqrt_disc) / (2.0f * a);
-        float t2 = (-b + sqrt_disc) / (2.0f * a);
-        float t = (t1 > 0.0f) ? t1 : t2;
-        if (t > 0.0f) {
-            float pred_x = target.x + target.vx * t;
-            float pred_y = target.y + target.vy * t;
-            dx = pred_x - e.x;
-            dy = pred_y - e.y;
-        }
-    }
+    // Use current missile speed for lead calculation to improve intercept at high speeds
+    float currSpeed = sqrt(e.vx * e.vx + e.vy * e.vy);
+    const float minLeadSpeed = 150.0f; // ensure reasonable lead when just launched
+    const float effSpeed = (currSpeed < minLeadSpeed) ? minLeadSpeed : currSpeed;
 
-    float dist = sqrt(dx * dx + dy * dy);
+    // Compute lead angle using reusable helper (world-frame)
+    float targetAngle = compute_lead_aim_angle(e, target, effSpeed);
 
-    float targetAngle = atan2(dx, dy) * 180.0f / 3.141592653589793f;
-
-    float angleDiff = targetAngle - e.rotation;
-    while (angleDiff > 180.0f) angleDiff -= 360.0f;
-    while (angleDiff < -180.0f) angleDiff += 360.0f;
-
-    float turnSpeed = 180.0f; // degrees per second
-    float turnAmount = turnSpeed * dt;
-    if (fabs(angleDiff) < turnAmount) {
-        e.rotation = targetAngle;
-    }
-    else {
-        e.rotation += (angleDiff > 0.0f ? 1.0f : -1.0f) * turnAmount;
-    }
+    // Turn towards the computed angle with missile turn speed
+    const float turnSpeed = 240.0f; // faster turning to track agile targets
+    const float turnAmount = turnSpeed * dt;
+    e.rotation = turn_towards_deg(e.rotation, targetAngle, turnAmount);
 
     // Accelerate forward in the direction facing
     float rad = e.rotation * 3.141592653589793f / 180.0f;
-    float accel = 500.0f; // acceleration forward
+    const float accel = 600.0f; // stronger accel for closure
     e.vx += sin(rad) * accel * dt;
     e.vy += cos(rad) * accel * dt;
+
+    //// Clamp maximum speed to maintain controllability
+    //const float maxSpeed = 700.0f;
+    //float newSpeed = sqrt(e.vx * e.vx + e.vy * e.vy);
+    //if (newSpeed > maxSpeed)
+    //{
+    //    float scale = maxSpeed / newSpeed;
+    //    e.vx *= scale;
+    //    e.vy *= scale;
+    //}
 }
 
 void _stdcall update_entities(Entity* entities, int count, float dt) {
@@ -127,9 +104,9 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
         {
             // If missile has a target index, use that entity otherwise fallback to player
             const Entity tgt = get_target_or_default(view, e, player);
-			update_missile(e, tgt, dt);
-            break;
-        }
+ 			update_missile(e, tgt, dt);
+             break;
+         }
 
 		case EntityType::Type_Cannon:
 			// Cannons fly straight, no update needed
