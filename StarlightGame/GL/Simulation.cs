@@ -65,25 +65,26 @@ namespace StarlightGame.GL
 
                     case EntityEvent.FireCannon:
                         {
-                            if (entity.EventTime + 0.2f > entity.TimeAlive)
+                            if (entity.EventTime + 0.01f > entity.TimeAlive)
                                 break;
 
                             float rad;
                             int targetIndex = Weapons.ResolveTargetIndex(scene, entity);
+                            float projSpeed = 400.0f;
                             if (targetIndex >= 0 && targetIndex < scene.entityHead)
                             {
                                 var target = scene.Entities[targetIndex];
-                                rad = Weapons.ComputeDirectAimAngle(entity, target);
+                                // Lead the target using cannon projectile speed
+                                rad = Weapons.ComputeLeadAimAngle(entity, target, projSpeed);
                             }
                             else
                             {
                                 rad = entity.RotationDeg * (float)Math.PI / 180.0f;
                             }
 
-                            float projSpeed = 400.0f;
                             float vx = (float)Math.Sin(rad) * projSpeed;
                             float vy = (float)Math.Cos(rad) * projSpeed;
-                            float offset = entity.Scale * 1.0f;
+                            float offset = entity.Scale * 1.5f;
                             float offsetX = (float)Math.Sin(rad) * offset;
                             float offsetY = (float)Math.Cos(rad) * offset;
                             Entity proj = new Entity

@@ -49,6 +49,18 @@ namespace StarlightGame.StarlightLib.Types
             VX += force * (float)Math.Sin(rad);
             VY += force * (float)Math.Cos(rad);
         }
+
+        public void LimitSpeed(float maxSpeed)
+        {
+            float speedSq = VX * VX + VY * VY;
+            float maxSpeedSq = maxSpeed * maxSpeed;
+            if (speedSq > maxSpeedSq)
+            {
+                float speed = (float)Math.Sqrt(speedSq);
+                VX = (VX / speed) * maxSpeed;
+                VY = (VY / speed) * maxSpeed;
+            }
+        }
     }
 
     internal enum EntityLayer

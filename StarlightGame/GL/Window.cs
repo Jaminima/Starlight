@@ -150,11 +150,13 @@ void main()
 
             Entity player = scene.Entities[0];
 
-            float speed = 50.0f * (float)e.Time;
+            float speed = 75.0f * (float)e.Time;
             if (keyboard.IsKeyDown(Keys.W)) player.ApplyForwardForce(speed);
             if (keyboard.IsKeyDown(Keys.S)) player.ApplyBackwardForce(speed * 0.5f);
             if (keyboard.IsKeyDown(Keys.A)) player.ApplyLeftForce(speed * 0.15f);
             if (keyboard.IsKeyDown(Keys.D)) player.ApplyRightForce(speed * 0.15f);
+
+            player.LimitSpeed(400.0f);
 
             float rotSpeed = 50.0f * (float)e.Time;
             if (keyboard.IsKeyDown(Keys.Q)) player.RotationDeg -= rotSpeed;

@@ -18,12 +18,12 @@ void update_enemy(Entity& e, const Entity& player, float dt) restrict(amp) {
 
     // Accelerate forward in the direction facing
     float rad = e.rotation * 3.141592653589793f / 180.0f;
-    float accel = 50.0f; // acceleration forward
+    float accel = 70.0f; // acceleration forward
     e.vx += sin(rad) * accel * dt;
     e.vy += cos(rad) * accel * dt;
 
     // Slow down on final approach
-    if (dist < 500.0f) {
+    if (dist < 900.0f) {
         float speed = sqrt(e.vx * e.vx + e.vy * e.vy);
         if (speed > 0.0f) {
             float decel = 50.0f; // deceleration rate
@@ -54,34 +54,39 @@ inline Entity get_target_or_default(const array_view<Entity,1>& view, const Enti
 }
 
 void update_missile(Entity& e, const Entity& target, float dt) restrict(amp) {
-    // Use current missile speed for lead calculation to improve intercept at high speeds
+    // Current missile speed and kinematics parameters
     float currSpeed = sqrt(e.vx * e.vx + e.vy * e.vy);
-    const float minLeadSpeed = 150.0f; // ensure reasonable lead when just launched
-    const float effSpeed = (currSpeed < minLeadSpeed) ? minLeadSpeed : currSpeed;
+    const float accel = 200.0f;  // forward acceleration (units/s^2)
+    const float maxSpeed = 700.0f; // design maximum speed
 
-    // Compute lead angle using reusable helper (world-frame)
-    float targetAngle = compute_lead_aim_angle(e, target, effSpeed);
+    // Predict an intercept heading that accounts for missile acceleration and speed clamp
+    float leadHeading = compute_lead_aim_angle_accel(e, target, currSpeed, accel, maxSpeed);
 
-    // Turn towards the computed angle with missile turn speed
-    const float turnSpeed = 240.0f; // faster turning to track agile targets
+    // Choose a desired speed for the guidance law (accelerating towards max)
+    float desiredSpeed = currSpeed + accel * dt;
+    if (desiredSpeed > maxSpeed) desiredSpeed = maxSpeed;
+
+    // Compute a momentum-aware heading that points the nose to reduce velocity error
+    float steerHeading = compute_momentum_adjusted_heading(leadHeading, desiredSpeed, e.vx, e.vy);
+
+    // Turn towards the momentum-adjusted heading with missile turn speed
+    const float turnSpeed = 240.0f; // degrees per second
     const float turnAmount = turnSpeed * dt;
-    e.rotation = turn_towards_deg(e.rotation, targetAngle, turnAmount);
+    e.rotation = turn_towards_deg(e.rotation, steerHeading, turnAmount);
 
     // Accelerate forward in the direction facing
     float rad = e.rotation * 3.141592653589793f / 180.0f;
-    const float accel = 600.0f; // stronger accel for closure
     e.vx += sin(rad) * accel * dt;
     e.vy += cos(rad) * accel * dt;
 
-    //// Clamp maximum speed to maintain controllability
-    //const float maxSpeed = 700.0f;
-    //float newSpeed = sqrt(e.vx * e.vx + e.vy * e.vy);
-    //if (newSpeed > maxSpeed)
-    //{
-    //    float scale = maxSpeed / newSpeed;
-    //    e.vx *= scale;
-    //    e.vy *= scale;
-    //}
+    // Optional: clamp to max speed to avoid uncontrollable dynamics
+    float newSpeed = sqrt(e.vx * e.vx + e.vy * e.vy);
+    if (newSpeed > maxSpeed)
+    {
+        float scale = maxSpeed / newSpeed;
+        e.vx *= scale;
+        e.vy *= scale;
+    }
 }
 
 void _stdcall update_entities(Entity* entities, int count, float dt) {
@@ -119,7 +124,7 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
             // Collision against player (existing)
             const Entity p = player;
             const bool shieldActive = p.lastEvent == EntityEvent::Event_Shields && p.eventTime + 5.0f > p.timeAlive;
-            const float playerRadius = p.scale;
+            const float playerRadius = p.scale * 1.5f;
             const float shieldRadius = p.scale * 3.0f;
 
             float d2p = dist2(e.x, e.y, p.x, p.y);
@@ -134,7 +139,7 @@ void _stdcall update_entities(Entity* entities, int count, float dt) {
 
             // Collision against enemies for player-fired missiles: check targetIndex when set
             bool hitEnemy = false;
-            if (!hitPlayer && e.type == EntityType::Type_Missile && e.targetIndex > 0 && e.targetIndex < (int)view.extent[0])
+            if (!hitPlayer /*&& e.type == EntityType::Type_Missile*/ && e.targetIndex > 0 && e.targetIndex < (int)view.extent[0])
             {
                 const Entity tgt = view[e.targetIndex];
                 if (tgt.type == EntityType::Type_Enemy)

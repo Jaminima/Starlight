@@ -19,7 +19,7 @@ namespace StarlightGame.GL
         public Entity Player => Entities[0];
 
         public Scene() {
-            this.Entities = new Entity[100000];
+            this.Entities = new Entity[1000];
 
             this.InitPlayer();
 
@@ -55,7 +55,7 @@ namespace StarlightGame.GL
                     Layer = EntityLayer.Foreground,
                     Type = EntityType.Enemy,
                     Mass = 1,
-                    Scale = 8,
+                    Scale = 20,
                     X = (float)(rand.NextDouble() * 1000 - 500),
                     Y = (float)(rand.NextDouble() * 1000 - 500),
                     TargetIndex = -1,

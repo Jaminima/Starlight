@@ -121,9 +121,9 @@ inline float compute_lead_aim_angle_accel(const Entity& shooter, const Entity& t
     float dx0 = tx0 - sx;
     float dy0 = ty0 - sy;
     float dist0 = sqrt(dx0 * dx0 + dy0 * dy0);
-    float t = dist0 / vInit;
+    float t = (vInit > 1e-4f) ? (dist0 / vInit) : 0.0f;
 
-    // Helper lambdas (as inline functions due to AMP restrictions)
+    // Piecewise distance for accelerating missile up to vmax
     auto missile_distance = [=](float tt) restrict(amp) -> float {
         if (accel <= 0.0f) {
             return vInit * tt;
@@ -149,20 +149,35 @@ inline float compute_lead_aim_angle_accel(const Entity& shooter, const Entity& t
         float vAvg = (t > 1e-4f) ? (s / t) : vInit;
         if (vAvg < minSpeed) vAvg = minSpeed;
 
-        // Fixed-point update: t = d / vAvg(t)
-        float tNew = d / vAvg;
-
-        // Dampen updates to improve stability
+        float tNew = (vAvg > 1e-4f) ? (d / vAvg) : t;
         t = 0.5f * t + 0.5f * tNew;
 
         if (fabs(tNew - t) < 1e-3f)
             break;
     }
 
-    // Intercept point using final t
     float ix = tx0 + tvx * t;
     float iy = ty0 + tvy * t;
     float dx = ix - sx;
     float dy = iy - sy;
     return atan2(dx, dy) * 180.0f / 3.141592653589793f;
+}
+
+// Compute a steering heading that accounts for current momentum by aiming along
+// the velocity error vector (v_desired - v_current). The nose points in the direction
+// where acceleration should act to reduce velocity error.
+inline float compute_momentum_adjusted_heading(float desiredHeadingDeg, float desiredSpeed, float currVx, float currVy) restrict(amp)
+{
+    const float PI = 3.141592653589793f;
+    float rad = desiredHeadingDeg * PI / 180.0f;
+    float hx = sin(rad);
+    float hy = cos(rad);
+    float vdx = hx * desiredSpeed;
+    float vdy = hy * desiredSpeed;
+    float ex = vdx - currVx;
+    float ey = vdy - currVy;
+    // If the error is tiny, just use desired heading
+    if (ex * ex + ey * ey < 1e-6f)
+        return desiredHeadingDeg;
+    return atan2(ex, ey) * 180.0f / 3.141592653589793f;
 }
